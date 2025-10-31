@@ -1,34 +1,69 @@
 import cv2
 import socket
-import pickle
 import struct
+import numpy as np
 
-HOST = '192.168.1.10'
-PORT = 8485
+TCP_PORT = None
+UDP_PORT = 37020
+PI_IP = None
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.bind(("", UDP_PORT))
+s.settimeout(5)
+
+print("Listening for Pi Server broadcast...")
+while True:
+    try:
+        data, addr = s.recvfrom(1024)
+        msg = data.decode().strip()
+        if msg.startswith("PI_Server:"):
+            TCP_PORT = int(msg.split(":")[1])
+            PI_IP = addr[0]
+            print(f"Discovered Raspberry Server: {PI_IP}:{TCP_PORT}")
+            break
+    except socket.timeout:
+        print("No broadcast yet. Retrying...")
+s.close()
+
+if not PI_IP:
+    print("Could not find Pi Server.")
+    exit()
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect((HOST, PORT))
-data = b""
-payload_size = struct.calcsize(">L")
+print("Connecting to Raspberry camera...")
+client_socket.connect((PI_IP, TCP_PORT))
+connection = client_socket.makefile('rb')
+print("Connected!")
 
-while True:
-    while len(data) < payload_size:
-        data += client_socket.recv(4096)
-    packed_msg_size = data[:payload_size]
-    data = data[payload_size:]
-    msg_size = struct.unpack(">L", packed_msg_size)[0]
+payload_size = struct.calcsize("<L")
 
-    while len(data) < msg_size:
-        data += client_socket.recv(4096)
-    frame_data = data[:msg_size]
-    data = data[msg_size:]
+try:
+    while True:
+        image_len_data = connection.read(payload_size)
+        if not image_len_data:
+            break
+        
+        image_len = struct.unpack(">L", image_len_data)[0]
+        if image_len == 0:
+            continue
+        
+        image_data = b""
+        
+        while len(image_data) < image_len:
+            image_data += connection.read(image_len - len(image_data))
+        
+        np_image = np.frombuffer(image_data, dtype=np.uint8)
+        frame = cv2.imdecode(np_image, cv2.IMREAD_COLOR)
 
-    frame = pickle.loads(frame_data)
-    frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
-    cv2.imshow("Raspberry Pi Camera Stream", frame)
+        if frame is None:
+            print("Warning: failed to decode frame")
+            continue
 
-    if cv2.waitKey(1) == 27:
-        break
+        cv2.imshow("Raspberry Pi Camera Stream", frame)
+        if cv2.waitKey(1) & 0xFF == 27:  # ESC key
+            break
+finally:
+    cv2.destroyAllWindows()
+    connection.close()
+    client_socket.close()
 
-client_socket.close()
-cv2.destroyAllWindows()
