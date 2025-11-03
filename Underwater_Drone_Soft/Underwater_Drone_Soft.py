@@ -1,69 +1,77 @@
-import cv2
 import socket
 import struct
+import cv2
 import numpy as np
+import time
 
-TCP_PORT = None
-UDP_PORT = 37020
-PI_IP = None
+SERVER_PORT = 8485
+BUFFER_SIZE = 65535
+TIMEOUT = 3.0
+RECONNECT_INTERVAL = 2.0
 
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.bind(("", UDP_PORT))
-s.settimeout(5)
+def setup_socket():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.settimeout(TIMEOUT)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    return s
 
-print("Listening for Pi Server broadcast...")
-while True:
-    try:
-        data, addr = s.recvfrom(1024)
-        msg = data.decode().strip()
-        if msg.startswith("PI_Server:"):
-            TCP_PORT = int(msg.split(":")[1])
-            PI_IP = addr[0]
-            print(f"Discovered Raspberry Server: {PI_IP}:{TCP_PORT}")
-            break
-    except socket.timeout:
-        print("No broadcast yet. Retrying...")
-s.close()
-
-if not PI_IP:
-    print("Could not find Pi Server.")
-    exit()
-
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-print("Connecting to Raspberry camera...")
-client_socket.connect((PI_IP, TCP_PORT))
-connection = client_socket.makefile('rb')
-print("Connected!")
-
-payload_size = struct.calcsize("<L")
-
-try:
+def discover_pi(s):
+    print("Searching for server...")
     while True:
-        image_len_data = connection.read(payload_size)
-        if not image_len_data:
-            break
-        
-        image_len = struct.unpack(">L", image_len_data)[0]
-        if image_len == 0:
-            continue
-        
-        image_data = b""
-        
-        while len(image_data) < image_len:
-            image_data += connection.read(image_len - len(image_data))
-        
-        np_image = np.frombuffer(image_data, dtype=np.uint8)
-        frame = cv2.imdecode(np_image, cv2.IMREAD_COLOR)
+        try:
+            s.sendto(b"PC_CLIENT", ('255.255.255.255', SERVER_PORT))
+            packet, addr = s.recvfrom(BUFFER_SIZE)
+            print(f"Server connected: {addr}")
+            return addr
+        except socket.timeout:
+            print("No response. Retrying...")
+            time.sleep(RECONNECT_INTERVAL)
 
-        if frame is None:
-            print("Warning: failed to decode frame")
-            continue
+def main():
+    s = setup_socket()
+    server_addr = None
+    packets = {}
+    frame_id = None
 
-        cv2.imshow("Raspberry Pi Camera Stream", frame)
-        if cv2.waitKey(1) & 0xFF == 27:  # ESC key
-            break
-finally:
+    while True:
+        if not server_addr:
+            server_addr = discover_pi(s)
+            packets.clear()
+            frame_id = None
+
+        try:
+            packet, addr = s.recvfrom(BUFFER_SIZE)
+            fid, chunk_id, total_size = struct.unpack("<III", packet[:12])
+            chunk = packet[12:]
+
+            if fid != frame_id:
+                frame_id = fid
+                packets = {}
+
+            packets[chunk_id] = chunk
+            assembled = b"".join(packets[i] for i in sorted(packets.keys()))
+            if len(assembled) >= total_size:
+                np_img = np.frombuffer(assembled, dtype=np.uint8)
+                frame = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+                if frame is not None:
+                    cv2.imshow("Drone stram", frame)
+                if cv2.waitKey(1) == 27:
+                    break
+
+        except socket.timeout:
+            print("Connection timeout. Trying to reconnect...")
+            server_addr = None
+
+        except OSError as e:
+            print(f"Socket error: {e}")
+            server_addr = None
+            time.sleep(1)
+
+        except Exception as e:
+            print("Unexpected error:", e)
+            time.sleep(1)
+
     cv2.destroyAllWindows()
-    connection.close()
-    client_socket.close()
 
+if __name__ == "__main__":
+    main()
