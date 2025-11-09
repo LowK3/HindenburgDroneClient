@@ -1,22 +1,10 @@
 import cv2, numpy as np, threading, time
-from Utils.get_screen_size import get_screen_size
+from Utils.screen_func import get_screen_size, letterbox
 
 class DisplayThread:
     def __init__(self, fb):
         self.fb = fb
         self.stop = threading.Event()
-
-    def _letterbox(self, img, target_w, target_h, color=(0, 0, 0)):
-        """Scale img to fit inside target while preserving aspect ratio and center it on a background."""
-        h, w = img.shape[:2]
-        scale = min(target_w / w, target_h / h)
-        new_w, new_h = int(w * scale), int(h * scale)
-        resized = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
-        top = (target_h - new_h) // 2
-        left = (target_w - new_w) // 2
-        out = np.full((target_h, target_w, 3), color, dtype=np.uint8)
-        out[top:top + new_h, left:left + new_w] = resized
-        return out
 
     def run(self):
         win = "Submarine Stream"
@@ -39,7 +27,7 @@ class DisplayThread:
                 # Preserve aspect ratio and fit to screen (letterbox)
                 fh, fw = frame.shape[:2]
                 if (fw, fh) != (screen_w, screen_h):
-                    frame = self._letterbox(frame, screen_w, screen_h)
+                    frame = self.letterbox(frame, screen_w, screen_h)
                 cv2.imshow(win, frame)
             else:
                 # Blank 3-channel frame sized to current screen
