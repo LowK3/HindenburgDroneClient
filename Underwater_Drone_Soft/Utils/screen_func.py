@@ -26,7 +26,7 @@ def get_screen_size():
 
     return 1920, 1080
 
-def letterbox(self, img, target_w, target_h, color=(0, 0, 0)):
+def letterbox(img, target_w, target_h, color=(0, 0, 0)):
         """Scale img to fit inside target while preserving aspect ratio and center it on a background."""
         h, w = img.shape[:2]
         scale = min(target_w / w, target_h / h)
