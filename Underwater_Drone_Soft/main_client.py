@@ -1,8 +1,8 @@
 import threading, time, sys
-from network.discovery_client import DiscoveryClient
-from network.tcp_video_client import TCPClient
-from video.display import DisplayThread
-from utils.frame_buffer import FrameBuffer
+from Network.discovery_client import DiscoveryClient
+from Network.tcp_video_client import TCPClient
+from Video.display import DisplayThread
+from Utils.frame_buffer import FrameBuffer
 from config import CON_INTERVAL
 
 def main():

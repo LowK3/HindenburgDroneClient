@@ -1,5 +1,5 @@
 import socket, struct, cv2, numpy as np
-from utils.common import recv_all
+from Utils.common import recv_all
 from config import TCP_TIMEOUT, DATA_WAIT
 
 class TCPClient:
