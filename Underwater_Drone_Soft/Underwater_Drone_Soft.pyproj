@@ -30,7 +30,7 @@
     <Compile Include="Network\__init__.py" />
     <Compile Include="Utils\common.py" />
     <Compile Include="Utils\frame_buffer.py" />
-    <Compile Include="Utils\screen_func.py" />
+    <Compile Include="Utils\display_func.py" />
     <Compile Include="Utils\__init__.py" />
     <Compile Include="Video\display.py" />
     <Compile Include="Video\__init__.py" />

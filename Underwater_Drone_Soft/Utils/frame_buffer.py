@@ -2,5 +2,6 @@ import threading
 
 class FrameBuffer:
     def __init__(self):
-        self.frame = None
+        import threading
         self.lock = threading.Lock()
+        self.frame = None

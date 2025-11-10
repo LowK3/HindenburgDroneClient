@@ -1,24 +1,57 @@
 import socket, time
-from config import UDP_PORT
+from config import UDP_PORT, UDP_TIMEOUT, CON_INTERVAL
+from Utils.common import log
 
 class DiscoveryClient:
-    def __init__(self, timeout=3.0):
-        self.timeout = timeout
+    """Handles UDP broadcast discovery of the server."""
+    def __init__(self):
+        self.sock = None
+
+    def create_socket(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        s.bind(("0.0.0.0", 0))
+        s.settimeout(UDP_TIMEOUT)
+        return s
 
     def discover(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        sock.settimeout(self.timeout)
+        """Broadcast PC_CLIENT and wait for PI_SERVER:<port> response."""
         try:
-            sock.sendto(b"PC_CLIENT", ('255.255.255.255', UDP_PORT))
+            if self.sock is None:
+                self.sock = self.create_socket()
+
+            # log("Broadcasting discovery packet...")
+            self.sock.sendto(b"PC_CLIENT", ("255.255.255.255", UDP_PORT))
+
             start = time.time()
-            while time.time() - start < self.timeout:
-                data, addr = sock.recvfrom(1024)
+            while time.time() - start < UDP_TIMEOUT:
+                try:
+                    data, addr = self.sock.recvfrom(1024)
+                except socket.timeout:
+                    break
+                if not data:
+                    continue
                 msg = data.decode(errors="ignore")
                 if msg.startswith("PI_SERVER:"):
-                    return addr[0], int(msg.split(":")[1])
-        except Exception:
-            return None, None
+                    try:
+                        port = int(msg.split(":")[1])
+                    except:
+                        continue
+                    log(f"Discovered server at {addr[0]}:{port}")
+                    return addr[0], port
+            # log("No discovery reply received")
+        except Exception as e:
+            log(f"Discovery error: {e}")
         finally:
-            sock.close()
+            self.stop()
         return None, None
+
+    def stop(self):
+        if self.sock:
+            try:
+                self.sock.close()
+                log("UDP discovery socket closed")
+            except Exception as e:
+                log(f"Error closing UDP socket: {e}")
+            self.sock = None
+        time.sleep(CON_INTERVAL)
