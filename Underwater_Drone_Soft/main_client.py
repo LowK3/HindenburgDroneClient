@@ -1,42 +1,68 @@
 import threading, time, sys
+
 from Network.discovery_client import DiscoveryClient
 from Network.tcp_video_client import TCPClient
+from Network.tcp_control_client import ControlClient
+
 from Video.display import DisplayThread
-from Utils.common import log
 from Utils.frame_buffer import FrameBuffer
+
+from Control.keyboard_input import KeyboardInput
+
+from Utils.common import log
 from config import CON_INTERVAL
 
 class ClientApp:
     def __init__(self):
         self.shutdown = threading.Event()
+
         self.fb = FrameBuffer()
         self.display = DisplayThread(self.fb)
+
         self.discovery = DiscoveryClient()
-        self.tcp = TCPClient()
+        self.video = TCPClient()
+        self.control = ControlClient()
+
+        self.keyboard = None
+        self.keyboard_thread = None
 
     def run(self):
-        # Launch display
+        """ Launch display """
         display_thread = threading.Thread(target=self.display.run, daemon=True)
         display_thread.start()
 
         log("Client started. Press ESC in the window to exit.")
 
         while not self.display.stop.is_set():
-            # Discovery loop
+            # Discovery server
             ip, port = self.discovery.discover()
             if not ip:
                 time.sleep(CON_INTERVAL)
                 continue
 
-            # Try connecting
-            if not self.tcp.connect(ip, port):
+            # Connect video TCP
+            if not self.video.connect(ip, port):
                 time.sleep(CON_INTERVAL)
                 continue
+
+            # Connect control TCP
+            if not self.control.connect(ip):
+                self.video.stop()
+                time.sleep(CON_INTERVAL)
+                continue
+
+            # Start keyboard controller
+            self.keyboard = KeyboardInput(self.control)
+            self.keyboard_thread = threading.Thread(
+                target=self.keyboard.run,
+                daemon=True
+            )
+            self.keyboard_thread.start()
 
             # Streaming loop
             while not self.display.stop.is_set():
                 try:
-                    frame = self.tcp.receive_frame()
+                    frame = self.video.receive_frame()
                     if frame is not None:
                         with self.fb.lock:
                             self.fb.frame = frame
@@ -48,24 +74,31 @@ class ClientApp:
                     break
 
             # cleanup and back to discovery
-            self.tcp.stop()
-            with self.fb.lock:
-                self.fb.frame = None
+            self.cleanup_after_disconnect()
             log("Reconnecting to server...")
             time.sleep(1.0)
 
         log("Display closed, shutting down client.")
         self.stop()
 
+    def cleanup_after_disconnect(self):
+        if self.keyboard:
+            self.keyboard.stop.set()
+        if self.control:
+            self.control.stop()
+        if self.video:
+            self.video.stop()
+        with self.fb.lock:
+            self.fb.frame = None
+
     def stop(self):
-        self.discovery.stop()
-        self.tcp.stop()
+        self.cleanup_after_disconnect()
         self.display.stop.set()
+        self.discovery.stop()
 
 if __name__ == "__main__":
     try:
-        app = ClientApp()
-        app.run()
+        ClientApp().run()
     except KeyboardInterrupt:
         log("KeyboardInterrupt, exiting...")
         sys.exit(0)

@@ -23,9 +23,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="config.py" />
+    <Compile Include="Control\keyboard_input.py" />
     <Compile Include="Control\__init__.py" />
     <Compile Include="main_client.py" />
     <Compile Include="Network\discovery_client.py" />
+    <Compile Include="Network\tcp_control_client.py" />
     <Compile Include="Network\tcp_video_client.py" />
     <Compile Include="Network\__init__.py" />
     <Compile Include="Utils\common.py" />
