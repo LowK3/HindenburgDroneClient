@@ -27,14 +27,14 @@
     <Compile Include="Control\__init__.py" />
     <Compile Include="main_client.py" />
     <Compile Include="Network\discovery_client.py" />
+    <Compile Include="Network\network_worker.py" />
     <Compile Include="Network\tcp_control_client.py" />
     <Compile Include="Network\tcp_video_client.py" />
     <Compile Include="Network\__init__.py" />
     <Compile Include="Utils\common.py" />
     <Compile Include="Utils\frame_buffer.py" />
-    <Compile Include="Utils\display_func.py" />
     <Compile Include="Utils\__init__.py" />
-    <Compile Include="Video\display.py" />
+    <Compile Include="Video\gui.py" />
     <Compile Include="Video\__init__.py" />
   </ItemGroup>
   <ItemGroup>

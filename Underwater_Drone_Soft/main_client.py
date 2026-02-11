@@ -1,3 +1,5 @@
+"""
+
 import threading, time, sys
 
 from Network.discovery_client import DiscoveryClient
@@ -12,12 +14,17 @@ from Control.keyboard_input import KeyboardInput
 from Utils.common import log
 from config import CON_INTERVAL
 
+from PySide6.QtWidgets import QApplication
+from Video.gui import VideoWindow
+import sys
+
+
 class ClientApp:
     def __init__(self):
         self.shutdown = threading.Event()
 
         self.fb = FrameBuffer()
-        self.display = DisplayThread(self.fb)
+        #self.display = DisplayThread(self.fb)
 
         self.discovery = DiscoveryClient()
         self.video = TCPClient()
@@ -27,11 +34,11 @@ class ClientApp:
         self.keyboard_thread = None
 
     def run(self):
-        """ Launch display """
+        # Launch display 
         display_thread = threading.Thread(target=self.display.run, daemon=True)
         display_thread.start()
 
-        log("Client started. Press ESC in the window to exit.")
+        log("Client started. Press ESC to exit.")
 
         while not self.display.stop.is_set():
             # Discovery server
@@ -102,3 +109,41 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         log("KeyboardInterrupt, exiting...")
         sys.exit(0)
+
+ """
+
+import sys
+import threading
+from PySide6.QtWidgets import QApplication
+from Video.gui import VideoWindow
+from Utils.frame_buffer import FrameBuffer
+from Network.network_worker import NetworkWorker
+from Utils.common import log
+
+class ClientApp:
+    def __init__(self):
+        self.fb = FrameBuffer()
+        self.stop_event = threading.Event()
+
+    def run(self):
+        # Start networking thread
+        net = NetworkWorker(self.fb, self.stop_event)
+        net_thread = threading.Thread(target=net.run, daemon=True)
+        net_thread.start()
+
+        # Start Qt GUI (MAIN THREAD)
+        app = QApplication(sys.argv)
+        window = VideoWindow(self.fb)
+
+        exit_code = app.exec()
+
+        # Shutdown
+        log("GUI closed, stopping network")
+        self.stop_event.set()
+        net_thread.join(timeout=2.0)
+
+        sys.exit(exit_code)
+
+if __name__ == "__main__":
+    ClientApp().run()
+

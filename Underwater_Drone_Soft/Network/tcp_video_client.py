@@ -3,7 +3,7 @@ import socket, struct, cv2, numpy as np, time
 from config import TCP_TIMEOUT, TCP_RECV_TIMEOUT, DATA_WAIT
 from Utils.common import log, recv_all
 
-class TCPClient:
+class VideoClient:
     """Maintains TCP connection to server and receives JPEG frames."""
     def __init__(self):
         self.sock = None
