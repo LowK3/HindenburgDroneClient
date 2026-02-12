@@ -1,59 +1,126 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QLabel, QDialog,
-    QPushButton, QVBoxLayout, QWidget, QGridLayout
+    QPushButton, QVBoxLayout, QWidget, QGridLayout,
+    QMenu, QHBoxLayout
 )
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QImage, QPixmap
+from PySide6.QtGui import QImage, QPixmap, QAction
+from PySide6.QtWidgets import QStackedLayout
+from PySide6.QtWidgets import QGraphicsBlurEffect
 import sys
 import cv2
-
-class SettingsDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Menu")
-        self.setModal(True)
-
-        layout = QVBoxLayout()
-        resume = QPushButton("Resume")
-        quit_ = QPushButton("Quit")
-
-        resume.clicked.connect(self.accept)
-        quit_.clicked.connect(lambda: QApplication.quit())
-
-        layout.addWidget(resume)
-        layout.addWidget(quit_)
-        self.setLayout(layout)
 
 class VideoWindow(QMainWindow):
     def __init__(self, frame_buffer):
         super().__init__()
         self.fb = frame_buffer
-
-        self.video_label = QLabel(alignment=Qt.AlignCenter)
-        self.video_label.setStyleSheet("background-color: black;")  # always keep video area black when empty
-
-        self.overlay = QLabel("Waiting for stream...", alignment=Qt.AlignCenter)
-        self.overlay.setStyleSheet(
-            "background-color: transparent; color: white; font-size: 24pt;"
-        )
-        # Allow clicks to pass through overlay to underlying widgets (not strictly necessary here)
-        self.overlay.setAttribute(Qt.WA_TransparentForMouseEvents)
-
-        # Container that overlays the two labels in the same grid cell
-        container = QWidget()
-        grid = QGridLayout(container)
-        grid.setContentsMargins(0, 0, 0, 0)
-        grid.addWidget(self.video_label, 0, 0)
-        grid.addWidget(self.overlay, 0, 0, alignment=Qt.AlignCenter)
-
-        self.setCentralWidget(container)
+        self.is_true_fullscreen = False
 
         self.setWindowTitle("Submarine Stream")
-        self.showNormal()
 
+        # ---- Central widget ----
+        central = QWidget()
+        self.setCentralWidget(central)
+
+        self.stack = QStackedLayout(central)
+        self.stack.setContentsMargins(0, 0, 0, 0)
+
+        # ---- Video label ----
+        self.video_label = QLabel(alignment=Qt.AlignCenter)
+        self.video_label.setStyleSheet("background-color: black;")
+
+        self.video_container = QWidget()
+        self.video_layout = QGridLayout(self.video_container)
+        self.video_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.video_layout.addWidget(self.video_label, 0, 0)
+
+        # Waiting label
+        self.waiting_label = QLabel("Waiting for stream...", alignment=Qt.AlignCenter)
+        self.waiting_label.setStyleSheet("""
+            color: white;
+            font-size: 28px;
+            background-color: transparent;
+        """)
+
+        self.video_layout.addWidget(self.waiting_label, 0, 0, alignment=Qt.AlignCenter)
+
+        # Replace stack base widget
+        self.stack.addWidget(self.video_container)
+
+        # ---- Menu overlay ----
+        self.menu_overlay = self.create_overlay()
+        self.stack.addWidget(self.menu_overlay)
+        self.menu_overlay.hide()
+
+        # Default windowed fullscreen
+        self.showMaximized()
+
+        # Timer
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
-        self.timer.start(16)  # ~60 FPS
+        self.timer.start(16)
+
+        self._create_actions()
+        
+
+    def _create_actions(self):
+        self.action_toggle_fullscreen = QAction("Toggle Fullscreen", self)
+        self.action_toggle_fullscreen.setShortcut("F11")
+        self.action_toggle_fullscreen.triggered.connect(self.toggle_fullscreen)
+        self.addAction(self.action_toggle_fullscreen)
+
+    def show_windowed_fullscreen(self):
+        self.is_true_fullscreen = False
+        self.showMaximized()
+
+    def show_true_fullscreen(self):
+        self.is_true_fullscreen = True
+        self.showFullScreen()
+
+    def toggle_fullscreen(self):
+        if self.is_true_fullscreen:
+            self.show_windowed_fullscreen()
+        else:
+            self.show_true_fullscreen()
+
+    def create_overlay(self):
+        overlay = QWidget()
+        overlay.setStyleSheet("background-color: rgba(0,0,0,150);")
+
+        layout = QVBoxLayout(overlay)
+        layout.setAlignment(Qt.AlignCenter)
+
+        resume_btn = QPushButton("Resume")
+        settings_btn = QPushButton("Settings")
+        quit_btn = QPushButton("Quit")
+
+        for btn in (resume_btn, settings_btn, quit_btn):
+            btn.setFixedWidth(250)
+            btn.setFixedHeight(50)
+
+        resume_btn.clicked.connect(self.toggle_overlay)
+        quit_btn.clicked.connect(self.close)
+
+        layout.addWidget(resume_btn)
+        layout.addWidget(settings_btn)
+        layout.addWidget(quit_btn)
+
+        return overlay
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.toggle_overlay()
+    
+    def toggle_overlay(self):
+        if self.menu_overlay.isVisible():
+            self.video_label.setGraphicsEffect(None)
+            self.menu_overlay.hide()
+        else:
+            blur = QGraphicsBlurEffect()
+            blur.setBlurRadius(25)
+            self.video_label.setGraphicsEffect(blur)
+            self.menu_overlay.show()
 
     def update_frame(self):
         with self.fb.lock:
@@ -61,9 +128,10 @@ class VideoWindow(QMainWindow):
 
         if frame is None:
             self.video_label.setPixmap(QPixmap())
-            self.overlay.setText("Waiting for stream...")
-            self.overlay.show()
+            self.waiting_label.show()
             return
+
+        self.waiting_label.hide()
 
         win_w = self.video_label.width()
         win_h = self.video_label.height()
@@ -80,7 +148,3 @@ class VideoWindow(QMainWindow):
 
         self.video_label.setPixmap(pixmap)
         self.overlay.hide()
-
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            SettingsDialog(self).exec()
