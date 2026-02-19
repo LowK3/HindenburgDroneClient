@@ -29,7 +29,7 @@
     <Compile Include="Network\discovery_client.py" />
     <Compile Include="Network\network_worker.py" />
     <Compile Include="Network\tcp_control_client.py" />
-    <Compile Include="Network\tcp_video_client.py" />
+    <Compile Include="Network\udp_video_client.py" />
     <Compile Include="Network\__init__.py" />
     <Compile Include="Utils\common.py" />
     <Compile Include="Utils\frame_buffer.py" />

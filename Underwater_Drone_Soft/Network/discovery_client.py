@@ -21,7 +21,7 @@ class DiscoveryClient:
                 self.sock = self.create_socket()
 
             # log("Broadcasting discovery packet...")
-            self.sock.sendto(b"PC_CLIENT", ("255.255.255.255", UDP_PORT))
+            self.sock.sendto(b"PC_CLIENT", ("<broadcast>", UDP_PORT))
 
             start = time.time()
             while time.time() - start < UDP_TIMEOUT:

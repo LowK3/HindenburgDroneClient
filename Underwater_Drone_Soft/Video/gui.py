@@ -50,7 +50,8 @@ class VideoWindow(QMainWindow):
 
         # ---- Menu overlay ----
         self.menu_overlay = self.create_overlay()
-        self.stack.addWidget(self.menu_overlay)
+        self.menu_overlay.setParent(self.centralWidget()) # Put it on top
+        self.menu_overlay.setGeometry(self.rect()) # Make it cover the screen
         self.menu_overlay.hide()
 
         # Default windowed fullscreen
@@ -62,7 +63,6 @@ class VideoWindow(QMainWindow):
         self.timer.start(16)
 
         self._create_actions()
-        
 
     def _create_actions(self):
         self.action_toggle_fullscreen = QAction("Toggle Fullscreen", self)
@@ -85,11 +85,32 @@ class VideoWindow(QMainWindow):
             self.show_true_fullscreen()
 
     def create_overlay(self):
-        overlay = QWidget()
-        overlay.setStyleSheet("background-color: rgba(0,0,0,150);")
+        overlay = QWidget(self.centralWidget())
+        # Dark grey semi-transparent background (RGBA: 40, 40, 40, 180)
+        overlay.setStyleSheet("background-color: rgba(40, 40, 40, 180);")
 
         layout = QVBoxLayout(overlay)
         layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)
+
+        # Common style for dark buttons
+        button_style = """
+            QPushButton {
+                background-color: #1A1A1A;
+                color: white;
+                border: 1px solid #333;
+                border-radius: 5px;
+                font-size: 18px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #333333;
+                border: 1px solid #555;
+            }
+            QPushButton:pressed {
+                background-color: #000000;
+            }
+        """
 
         resume_btn = QPushButton("Resume")
         settings_btn = QPushButton("Settings")
@@ -98,6 +119,7 @@ class VideoWindow(QMainWindow):
         for btn in (resume_btn, settings_btn, quit_btn):
             btn.setFixedWidth(250)
             btn.setFixedHeight(50)
+            btn.setStyleSheet(button_style)
 
         resume_btn.clicked.connect(self.toggle_overlay)
         quit_btn.clicked.connect(self.close)
@@ -114,15 +136,29 @@ class VideoWindow(QMainWindow):
     
     def toggle_overlay(self):
         if self.menu_overlay.isVisible():
+            # Remove effect and hide
             self.video_label.setGraphicsEffect(None)
             self.menu_overlay.hide()
         else:
+            # 1. Apply heavy blur to the video label
             blur = QGraphicsBlurEffect()
-            blur.setBlurRadius(25)
+            blur.setBlurRadius(40) # Increased radius for "grey wash" look
             self.video_label.setGraphicsEffect(blur)
+        
+            # 2. Ensure overlay covers the whole window and show
+            self.menu_overlay.setGeometry(self.centralWidget().rect())
             self.menu_overlay.show()
+            self.menu_overlay.raise_() # Make sure it's on top of everything
+
+    def resizeEvent(self, event):
+    # Ensure the menu stays full-screen even when window is resized
+        self.menu_overlay.setGeometry(self.rect())
+        super().resizeEvent(event)
 
     def update_frame(self):
+        if self.menu_overlay.isVisible():
+            return 
+
         with self.fb.lock:
             frame = None if self.fb.frame is None else self.fb.frame.copy()
 
@@ -141,10 +177,7 @@ class VideoWindow(QMainWindow):
         new_w = int(frame_w * scale)
         new_h = int(frame_h * scale)
 
-        frame_resized = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_AREA)
+        frame_resized = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_CUBIC)
 
-        qt_img = QImage(frame_resized.data, new_w, new_h, 3 * new_w, QImage.Format_BGR888)
-        pixmap = QPixmap.fromImage(qt_img)
-
-        self.video_label.setPixmap(pixmap)
-        self.overlay.hide()
+        qt_img = QImage(frame_resized.data, new_w, new_h, 3 * new_w, QImage.Format_RGB888)
+        self.video_label.setPixmap(QPixmap.fromImage(qt_img))

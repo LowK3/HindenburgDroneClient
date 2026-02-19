@@ -1,6 +1,7 @@
 """ Video network ports """
 TCP_PORT = 8485
 UDP_PORT = 37020
+UDP_VIDEO_PORT = 8486
 
 """ Engine control port """
 CONTROL_TCP_PORT = 8600 
@@ -19,4 +20,3 @@ LOG_PREFIX = "[CLIENT]"
 
 """ Video display settings """
 WINDOW_NAME = "Submarine Stream"
-# DEFAULT_RES = (1920, 1080)
