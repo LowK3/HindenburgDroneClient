@@ -184,5 +184,5 @@ class VideoWindow(QMainWindow):
 
         frame_resized = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
 
-        qt_img = QImage(frame_resized.data, new_w, new_h, 3 * new_w, QImage.Format_RGB888)
+        qt_img = QImage(frame_resized.data, new_w, new_h, 3 * new_w, QImage.Format_BGR888)
         self.video_label.setPixmap(QPixmap.fromImage(qt_img))
