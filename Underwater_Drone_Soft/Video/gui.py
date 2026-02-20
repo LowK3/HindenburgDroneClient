@@ -7,6 +7,7 @@ from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QImage, QPixmap, QAction
 from PySide6.QtWidgets import QStackedLayout
 from PySide6.QtWidgets import QGraphicsBlurEffect
+from config import WINDOW_NAME
 import sys
 import cv2
 
@@ -16,7 +17,7 @@ class VideoWindow(QMainWindow):
         self.fb = frame_buffer
         self.is_true_fullscreen = False
 
-        self.setWindowTitle("Submarine Stream")
+        self.setWindowTitle(WINDOW_NAME)
 
         # ---- Central widget ----
         central = QWidget()
@@ -160,7 +161,11 @@ class VideoWindow(QMainWindow):
             return 
 
         with self.fb.lock:
+            if not self.fb.new_frame:
+                return
+        
             frame = None if self.fb.frame is None else self.fb.frame.copy()
+            self.fb.new_frame = False
 
         if frame is None:
             self.video_label.setPixmap(QPixmap())
@@ -177,7 +182,7 @@ class VideoWindow(QMainWindow):
         new_w = int(frame_w * scale)
         new_h = int(frame_h * scale)
 
-        frame_resized = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_CUBIC)
+        frame_resized = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
 
         qt_img = QImage(frame_resized.data, new_w, new_h, 3 * new_w, QImage.Format_RGB888)
         self.video_label.setPixmap(QPixmap.fromImage(qt_img))

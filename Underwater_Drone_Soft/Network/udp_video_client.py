@@ -1,4 +1,4 @@
-import socket, struct, cv2, numpy as np, time
+import socket, struct, cv2, numpy as np, time, simplejpeg
 from config import UDP_VIDEO_PORT, DATA_WAIT
 from Utils.common import log
 
@@ -44,8 +44,10 @@ class VideoClient:
                     keys_to_delete = [k for k in self.frame_buffer.keys() if k <= frame_id]
                     for k in keys_to_delete: del self.frame_buffer[k]
 
-                    np_img = np.frombuffer(data, dtype=np.uint8)
-                    return cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+                    try:
+                        return simplejpeg.decode_jpeg(data, colorspace='RGB')
+                    except:
+                        return None
 
             except socket.timeout:
                 if time.time() - self.last_data_time > DATA_WAIT:

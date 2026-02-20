@@ -1,6 +1,6 @@
 import time
 from Network.discovery_client import DiscoveryClient
-from Network.tcp_video_client import VideoClient
+from Network.udp_video_client import VideoClient
 from Network.tcp_control_client import ControlClient
 from Utils.common import log
 from config import CON_INTERVAL
@@ -41,6 +41,7 @@ class NetworkWorker:
                     if frame is not None:
                         with self.fb.lock:
                             self.fb.frame = frame
+                            self.fb.new_frame = True
 
                 except Exception as e:
                     log(f"Network error: {e}")
