@@ -2,7 +2,6 @@ import time, threading
 from Network.discovery_client import DiscoveryClient
 from Network.udp_video_client import VideoClient
 from Network.tcp_control_client import ControlClient
-from Control.keyboard_input import KeyboardInput
 from Utils.common import log
 from config import CON_INTERVAL
 
@@ -13,9 +12,6 @@ class NetworkWorker:
         self.discovery = DiscoveryClient()
         self.video = VideoClient()
         self.control = ControlClient()
-
-        self.keyboard = KeyboardInput(self.control)
-        self.keyboard_thread = None
 
     def run(self):
         log("Network started.")
@@ -38,12 +34,6 @@ class NetworkWorker:
                 time.sleep(CON_INTERVAL)
                 continue
 
-            # Start the keyboard thread
-            self.keyboard.stop.clear() # Reset the stop flag
-            self.keyboard_thread = threading.Thread(target=self.keyboard.run, daemon=True)
-            self.keyboard_thread.start()
-            log("Keyboard input active.")
-
             # Streaming loop
             while not self.stop_event.is_set():
                 try:
@@ -57,9 +47,6 @@ class NetworkWorker:
                     break
 
             # Cleanup and back to discovery
-            self.keyboard.stop.set()
-            if self.keyboard_thread:
-                self.keyboard_thread.join(timeout=1.0)
             self.video.stop()
             self.control.stop()
 

@@ -23,7 +23,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="config.py" />
-    <Compile Include="Control\keyboard_input.py" />
     <Compile Include="Control\__init__.py" />
     <Compile Include="main_client.py" />
     <Compile Include="Network\discovery_client.py" />

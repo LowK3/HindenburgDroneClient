@@ -1,3 +1,4 @@
+import sys,cv2
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QLabel, QDialog,
     QPushButton, QVBoxLayout, QWidget, QGridLayout,
@@ -8,25 +9,31 @@ from PySide6.QtGui import QImage, QPixmap, QAction
 from PySide6.QtWidgets import QStackedLayout
 from PySide6.QtWidgets import QGraphicsBlurEffect
 from config import WINDOW_NAME
-import sys
-import cv2
 
 class VideoWindow(QMainWindow):
-    def __init__(self, frame_buffer):
+    def __init__(self, frame_buffer, control_client):
         super().__init__()
         self.fb = frame_buffer
-        self.is_true_fullscreen = False
+
+        self.control = control_client
+        self.current_command = "STOP\n"
 
         self.setWindowTitle(WINDOW_NAME)
+        self.is_true_fullscreen = False
 
-        # ---- Central widget ----
+        # Heartbeat timer
+        self.control_timer = QTimer()
+        self.control_timer.timeout.connect(self.send_control)
+        self.control_timer.start(1000)
+
+        # Central widget
         central = QWidget()
         self.setCentralWidget(central)
 
         self.stack = QStackedLayout(central)
         self.stack.setContentsMargins(0, 0, 0, 0)
 
-        # ---- Video label ----
+        # Video label
         self.video_label = QLabel(alignment=Qt.AlignCenter)
         self.video_label.setStyleSheet("background-color: black;")
 
@@ -43,13 +50,12 @@ class VideoWindow(QMainWindow):
             font-size: 28px;
             background-color: transparent;
         """)
-
         self.video_layout.addWidget(self.waiting_label, 0, 0, alignment=Qt.AlignCenter)
 
         # Replace stack base widget
         self.stack.addWidget(self.video_container)
 
-        # ---- Menu overlay ----
+        # Menu overlay
         self.menu_overlay = self.create_overlay()
         self.menu_overlay.setParent(self.centralWidget()) # Put it on top
         self.menu_overlay.setGeometry(self.rect()) # Make it cover the screen
@@ -61,9 +67,46 @@ class VideoWindow(QMainWindow):
         # Timer
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
-        self.timer.start(16)
+        self.timer.start(32)
 
         self._create_actions()
+
+    def send_control(self):
+        """ Sends the continuous heartbeat to the drone """
+
+        if self.control and self.control.sock:
+            self.control.send(self.current_command)
+
+    def keyPressEvent(self, event):
+        if event.isAutoRepeat(): 
+            return
+        key = event.key()
+
+        # 1. Continuous Movement (Updates the heartbeat)
+        if key == Qt.Key_W: self.current_command = "W\n"
+        elif key == Qt.Key_S: self.current_command = "S\n"
+        elif key == Qt.Key_A: self.current_command = "A\n"
+        elif key == Qt.Key_D: self.current_command = "D\n"
+        elif key == Qt.Key_U: self.current_command = "UP\n"
+        elif key == Qt.Key_J: self.current_command = "DOWN\n"
+
+        # 2. Discrete Adjustments (Sent instantly, once per press)
+        elif key == Qt.Key_O: self.control.send("REAR+\n")
+        elif key == Qt.Key_L: self.control.send("REAR-\n")
+        elif key == Qt.Key_I: self.control.send("FRONT+\n")
+        elif key == Qt.Key_K: self.control.send("FRONT-\n")
+
+        elif key == Qt.Key_Escape:
+            self.toggle_overlay()
+
+    def keyReleaseEvent(self, event):
+        if event.isAutoRepeat(): 
+            return
+            
+        # Only stop the drone if a movement key was released
+        movement_keys = {Qt.Key_W, Qt.Key_S, Qt.Key_A, Qt.Key_D, Qt.Key_U, Qt.Key_J}
+        if event.key() in movement_keys:
+            self.current_command = "STOP\n"
 
     def _create_actions(self):
         self.action_toggle_fullscreen = QAction("Toggle Fullscreen", self)

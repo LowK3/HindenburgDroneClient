@@ -19,7 +19,7 @@ class ClientApp:
 
         # Start Qt GUI (Main Thread)
         app = QApplication(sys.argv)
-        window = VideoWindow(self.fb)
+        window = VideoWindow(self.fb, net.control)
 
         exit_code = app.exec()
 
