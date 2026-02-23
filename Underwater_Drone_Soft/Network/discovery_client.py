@@ -4,6 +4,7 @@ from Utils.common import log
 
 class DiscoveryClient:
     """Handles UDP broadcast discovery of the server."""
+
     def __init__(self):
         self.sock = None
 
@@ -16,6 +17,7 @@ class DiscoveryClient:
 
     def discover(self):
         """Broadcast PC_CLIENT and wait for PI_SERVER:<port> response."""
+
         try:
             if self.sock is None:
                 self.sock = self.create_socket()
@@ -39,7 +41,7 @@ class DiscoveryClient:
                         continue
                     log(f"Discovered server at {addr[0]}:{port}")
                     return addr[0], port
-            # log("No discovery reply received")
+            log("No discovery reply received")
         except Exception as e:
             log(f"Discovery error: {e}")
         finally:
@@ -50,7 +52,7 @@ class DiscoveryClient:
         if self.sock:
             try:
                 self.sock.close()
-                log("UDP discovery socket closed")
+                log("UDP discovery socket closed.")
             except Exception as e:
                 log(f"Error closing UDP socket: {e}")
             self.sock = None

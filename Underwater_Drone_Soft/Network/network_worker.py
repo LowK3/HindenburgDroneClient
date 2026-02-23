@@ -18,7 +18,7 @@ class NetworkWorker:
         self.keyboard_thread = None
 
     def run(self):
-        log("Network started")
+        log("Network started.")
 
         while not self.stop_event.is_set():
             # Discovery server
@@ -42,7 +42,7 @@ class NetworkWorker:
             self.keyboard.stop.clear() # Reset the stop flag
             self.keyboard_thread = threading.Thread(target=self.keyboard.run, daemon=True)
             self.keyboard_thread.start()
-            log("Keyboard input active")
+            log("Keyboard input active.")
 
             # Streaming loop
             while not self.stop_event.is_set():
@@ -65,8 +65,9 @@ class NetworkWorker:
 
             with self.fb.lock:
                 self.fb.frame = None
-
-            log("Disconnected. Returning to discovery...")
+            
+            if not self.stop_event.is_set():
+                log("Disconnected. Returning to discovery...")
             time.sleep(CON_INTERVAL)
 
-        log("Network shutting down")
+        log("Network shut down.")

@@ -1,5 +1,4 @@
 import threading, time, keyboard # pip install keyboard
-
 from Utils.common import log
 
 class KeyboardInput:

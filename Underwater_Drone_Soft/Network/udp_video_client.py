@@ -14,12 +14,12 @@ class VideoClient:
         self.sock.bind(("0.0.0.0", UDP_VIDEO_PORT))
         self.sock.settimeout(1.0)
         self.last_data_time = time.time()
-        log(f"UDP Video client bound to port {UDP_VIDEO_PORT}")
+        log(f"UDP Video client bound to port {UDP_VIDEO_PORT}.")
         return True
 
     def receive_frame(self):
         if not self.sock:
-            raise ConnectionError("Socket not bound")
+            raise ConnectionError("Socket not bound.")
 
         while True:
             try:
@@ -51,7 +51,7 @@ class VideoClient:
 
             except socket.timeout:
                 if time.time() - self.last_data_time > DATA_WAIT:
-                    raise TimeoutError("No video data from server")
+                    raise TimeoutError("No video data from server.")
                 return None
             except Exception as e:
                 raise ConnectionResetError(f"UDP receive error: {e}")
@@ -59,5 +59,5 @@ class VideoClient:
     def stop(self):
         if self.sock:
             self.sock.close()
-            log("UDP video socket closed")
+            log("UDP video socket closed.")
         self.sock = None

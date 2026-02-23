@@ -1,10 +1,10 @@
 import socket
-
-from Utils.common import log
 from config import CONTROL_TCP_PORT, CONTROL_TIMEOUT
+from Utils.common import log
 
 class ControlClient:
     """ Client-side engine control link. """
+
     def __init__(self):
         self.sock = None
 
@@ -14,7 +14,7 @@ class ControlClient:
         try:
             self.sock.connect((ip, CONTROL_TCP_PORT))
             self.sock.settimeout(None)
-            log(f"Control TCP connected to {ip}:{CONTROL_TCP_PORT}")
+            log(f"Control TCP connected to {ip}:{CONTROL_TCP_PORT}.")
             return True
         except Exception as e:
             log(f"Control TCP connect failed: {e}")
@@ -33,5 +33,5 @@ class ControlClient:
     def stop(self):
         if self.sock:
             self.sock.close()
-            log("Control TCP socket closed")
+            log("Control TCP socket closed.")
         self.sock = None

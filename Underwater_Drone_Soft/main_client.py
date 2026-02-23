@@ -17,14 +17,14 @@ class ClientApp:
         net_thread = threading.Thread(target=net.run, daemon=True)
         net_thread.start()
 
-        # Start Qt GUI (MAIN THREAD)
+        # Start Qt GUI (Main Thread)
         app = QApplication(sys.argv)
         window = VideoWindow(self.fb)
 
         exit_code = app.exec()
 
         # Shutdown
-        log("GUI closed, stopping network")
+        log("GUI closed, stopping network.")
         self.stop_event.set()
         net_thread.join(timeout=2.0)
 
