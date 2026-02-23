@@ -24,7 +24,7 @@ class VideoWindow(QMainWindow):
         # Heartbeat timer
         self.control_timer = QTimer()
         self.control_timer.timeout.connect(self.send_control)
-        self.control_timer.start(1000)
+        self.control_timer.start(100)
 
         # Central widget
         central = QWidget()
