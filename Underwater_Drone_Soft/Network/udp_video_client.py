@@ -1,4 +1,4 @@
-import socket, struct, cv2, numpy as np, time, simplejpeg
+import socket, struct, cv2, numpy as np, time, simplejpeg, traceback
 from config import UDP_VIDEO_PORT, DATA_WAIT
 from Utils.common import log
 
@@ -57,7 +57,7 @@ class VideoClient:
                     raise TimeoutError("No video data from server.")
                 return None
             except Exception as e:
-                raise ConnectionResetError(f"UDP receive error: {e}")
+                raise ConnectionResetError(f"UDP receive error: {e}\n{traceback.format_exc()}")
 
     def stop(self):
         if self.sock:

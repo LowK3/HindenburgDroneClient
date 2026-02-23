@@ -1,4 +1,4 @@
-import socket
+import socket, traceback
 from config import CONTROL_TCP_PORT, CONTROL_TIMEOUT
 from Utils.common import log
 
@@ -17,7 +17,7 @@ class ControlClient:
             log(f"Control TCP connected to {ip}:{CONTROL_TCP_PORT}.")
             return True
         except Exception as e:
-            log(f"Control TCP connect failed: {e}")
+            log(f"Control TCP connect failed: {e}\n{traceback.format_exc()}")
             self.sock = None
             return False
 
@@ -27,7 +27,7 @@ class ControlClient:
         try:
             self.sock.sendall(cmd.encode())
         except Exception as e:
-            log(f"Control send error: {e}")
+            log(f"Control send error: {e}\n{traceback.format_exc()}")
             self.sock = None
 
     def stop(self):

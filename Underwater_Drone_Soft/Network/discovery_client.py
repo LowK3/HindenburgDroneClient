@@ -1,4 +1,4 @@
-import socket, time
+import socket, time, traceback
 from config import UDP_PORT, UDP_TIMEOUT, CON_INTERVAL
 from Utils.common import log
 
@@ -43,7 +43,7 @@ class DiscoveryClient:
                     return addr[0], port
             log("No discovery reply received")
         except Exception as e:
-            log(f"Discovery error: {e}")
+            log(f"Discovery error: {e}\n{traceback.format_exc()}")
         finally:
             self.stop()
         return None, None
@@ -54,6 +54,6 @@ class DiscoveryClient:
                 self.sock.close()
                 log("UDP discovery socket closed.")
             except Exception as e:
-                log(f"Error closing UDP socket: {e}")
+                log(f"Error closing UDP socket: {e}\n{traceback.format_exc()}")
             self.sock = None
         time.sleep(CON_INTERVAL)

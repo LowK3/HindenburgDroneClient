@@ -1,4 +1,4 @@
-import time, threading
+import time, threading, traceback
 from Network.discovery_client import DiscoveryClient
 from Network.udp_video_client import VideoClient
 from Network.tcp_control_client import ControlClient
@@ -43,7 +43,7 @@ class NetworkWorker:
                             self.fb.frame = frame
                             self.fb.new_frame = True
                 except Exception as e:
-                    log(f"Network error: {e}")
+                    log(f"Network error: {e}\n{traceback.format_exc()}")
                     break
 
             # Cleanup and back to discovery
