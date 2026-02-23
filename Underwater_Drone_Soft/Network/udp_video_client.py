@@ -44,6 +44,9 @@ class VideoClient:
                     keys_to_delete = [k for k in self.frame_buffer.keys() if k <= frame_id]
                     for k in keys_to_delete: del self.frame_buffer[k]
 
+                    if len(self.frame_buffer) > 100:
+                        self.frame_buffer.clear()
+
                     try:
                         return simplejpeg.decode_jpeg(data, colorspace='RGB')
                     except:
