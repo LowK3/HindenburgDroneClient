@@ -23,7 +23,7 @@ class VideoClient:
 
         while True:
             try:
-                packet, addr = self.sock.recvfrom(65536)
+                packet, addr = self.sock.recvfrom(65536)  # Buffer size large enough for UDP packet
                 self.last_data_time = time.time()
 
                 if len(packet) < 7: continue

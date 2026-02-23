@@ -173,10 +173,6 @@ class VideoWindow(QMainWindow):
         layout.addWidget(quit_btn)
 
         return overlay
-
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            self.toggle_overlay()
     
     def toggle_overlay(self):
         if self.menu_overlay.isVisible():
