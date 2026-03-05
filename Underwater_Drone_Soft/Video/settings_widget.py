@@ -5,10 +5,10 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeySequence
 
 CMD_LABELS = {
-    "W\n": "Forward", "S\n": "Backward", "A\n": "Turn Left", "D\n": "Turn Right",
-    "UP\n": "Tilt Up", "DOWN\n": "Tilt Down",
-    "REAR+\n": "Rear Power +", "REAR-\n": "Rear Power -",
-    "FRONT+\n": "Front Power +", "FRONT-\n": "Front Power -"
+    "W\n": "FORWARD", "S\n": "BACKWARD", "A\n": "TURN LEFT", "D\n": "TURN RIGHT",
+    "UP\n": "TILT UP", "DOWN\n": "TILT DOWN",
+    "REAR+\n": "REAR POWER +", "REAR-\n": "REAR POWER -",
+    "FRONT+\n": "FRONT POWER +", "FRONT-\n": "FRONT POWER -"
 }
 
 class KeyGrabberButton(QPushButton):
@@ -23,11 +23,19 @@ class KeyGrabberButton(QPushButton):
 
     def update_display(self):
         if self.current_key == 0:
-            self.setText("Unbound")
-            self.setStyleSheet("background-color: #cc0000; color: white; padding: 5px; border-radius: 5px;")
+            self.setText("UNBOUND")
+            self.setStyleSheet("""
+            font-family: 'Segoe Ui'; background-color: #cc0000; 
+            color: white; padding: 5px; border-radius: 5px;
+            border: 1px solid #FF3336
+            """)
         else:
             self.setText(QKeySequence(self.current_key).toString())
-            self.setStyleSheet("background-color: #333; color: white; padding: 5px; border-radius: 5px;")
+            self.setStyleSheet("""
+            font-family: 'Segoe Ui'; background-color: #333; 
+            color: white; padding: 5px; border-radius: 5px;
+            border: 1px solid #444
+            """)
 
     def keyPressEvent(self, event):
         if self.listening:
@@ -45,10 +53,18 @@ class KeyGrabberButton(QPushButton):
             super().keyPressEvent(event)
 
     def mousePressEvent(self, event):
-        self.listening = True
-        self.setText("Press any key...")
-        self.setStyleSheet("background-color: #0078D7; color: white; padding: 5px; border-radius: 5px;")
-        self.setFocus()
+        was_listening = self.listening
+        self.parent_menu.reset_all_grabbers()
+
+        if not was_listening:
+            self.listening = True
+            self.setText("PRESS ANY KEY...")
+            self.setStyleSheet("""
+            font-family: 'Segoe Ui'; background-color: #DBDBDB; 
+            color: black; padding: 5px; border-radius: 5px;
+            border: 1px solid #444
+            """)
+            self.setFocus()
 
 class SettingsWidget(QWidget):
     """ The in-overlay settings page for changing keybinds. """
@@ -69,8 +85,11 @@ class SettingsWidget(QWidget):
         panel_layout.setAlignment(Qt.AlignCenter)
         panel_layout.setContentsMargins(30, 30, 30, 30)
         
-        title = QLabel("Control Settings")
-        title.setStyleSheet("font-size: 32px; font-weight: bold; color: white; margin-bottom: 20px; background: transparent; border: none;")
+        title = QLabel("CONTROL SETTINGS")
+        title.setStyleSheet("""
+        font-family: 'Segoe Ui'; font-size: 32px; font-weight: bold;
+        color: white; margin-bottom: 20px; background: transparent;
+        """)
         title.setAlignment(Qt.AlignCenter)
         panel_layout.addWidget(title)
         
@@ -84,25 +103,34 @@ class SettingsWidget(QWidget):
             btn = KeyGrabberButton(cmd, key, self)
             self.buttons[cmd] = btn
             
-            lbl = QLabel(CMD_LABELS[cmd] + ":")
-            lbl.setStyleSheet("font-size: 18px; font-weight: bold; color: white; background: transparent; border: none;")
+            lbl = QLabel(CMD_LABELS[cmd] + "   ")
+            lbl.setStyleSheet("""
+            font-family: 'Segoe Ui'; font-size: 17px; 
+            color: white; background: transparent;
+            """)
             form_layout.addRow(lbl, btn)
             
         panel_layout.addWidget(form_container)
         
-        self.save_btn = QPushButton("Save | Return")
+        self.save_btn = QPushButton("SAVE | RETURN")
         self.save_btn.setFixedHeight(50)
         self.save_btn.setStyleSheet("""
             QPushButton {
-                background-color: #28a745; color: white;
-                border: 1px solid #1e7e34; border-radius: 5px;
+                font-family: 'Segoe Ui'; background-color: #333; color: white;
+                border: 2px solid #444; border-radius: 5px;
                 font-size: 18px; font-weight: bold; margin-top: 20px;
             }
-            QPushButton:hover { background-color: #218838; }
-            QPushButton:pressed { background-color: #1e7e34; }
+            QPushButton:hover { background-color: #444444; border: 2px solid #666; }
         """)
         panel_layout.addWidget(self.save_btn)
         outer_layout.addWidget(self.panel)
+
+    def reset_all_grabbers(self):
+        for btn in self.buttons.values():
+            if btn.listening:
+                btn.listening = False
+                btn.clearFocus()
+                btn.update_display()
 
     def resolve_key_conflict(self, target_cmd, new_key):
         for cmd, btn in self.buttons.items():

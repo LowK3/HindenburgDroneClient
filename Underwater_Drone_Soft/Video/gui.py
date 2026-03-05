@@ -40,7 +40,7 @@ class VideoWindow(QMainWindow):
 
     def _setup_bindings(self):
         """ Initializes QSettings and loads saved keybinds. """
-        self.settings = QSettings("Underwater Drone", "DroneClient")
+        self.settings = QSettings("UnderwaterDrone", "DroneClient")
         self.default_bindings = {
             "W\n": Qt.Key_W, "S\n": Qt.Key_S, "A\n": Qt.Key_A, "D\n": Qt.Key_D,
             "UP\n": Qt.Key_U, "DOWN\n": Qt.Key_J,
@@ -65,12 +65,15 @@ class VideoWindow(QMainWindow):
         self.video_layout.setContentsMargins(0, 0, 0, 0)
 
         self.video_label = QLabel(alignment=Qt.AlignCenter)
-        self.video_label.setStyleSheet("background-color: black;")
+        self.video_label.setStyleSheet("background-color: #0D0D0D;")
         self.video_layout.addWidget(self.video_label, 0, 0)
 
         # Waiting label
         self.waiting_label = QLabel("Waiting for stream...", alignment=Qt.AlignCenter)
-        self.waiting_label.setStyleSheet("color: white; font-size: 40px; font-weight: bold; background: transparent;")
+        self.waiting_label.setStyleSheet("""
+        font-family: 'Segoe Ui'; color: white; font-size: 40px; 
+        font-weight: bold; background: transparent;
+        """)
         self.video_layout.addWidget(self.waiting_label, 0, 0, alignment=Qt.AlignCenter)
 
         self.stack.addWidget(self.video_container)
@@ -94,7 +97,9 @@ class VideoWindow(QMainWindow):
 
         menu_panel = QWidget()
         menu_panel.setObjectName("MenuPanel")
-        menu_panel.setStyleSheet("#MenuPanel { background-color: #1A1A1A; border-radius: 15px; border: 2px solid #333; }")
+        menu_panel.setStyleSheet("""#MenuPanel
+        { background-color: #1A1A1A; border-radius: 15px; border: 2px solid #333; }
+        """)
         menu_panel.setFixedWidth(350)
         
         menu_layout = QVBoxLayout(menu_panel)
@@ -105,16 +110,16 @@ class VideoWindow(QMainWindow):
         button_style = """
             QPushButton {
                 background-color: #333; color: white;
-                border: 1px solid #444; border-radius: 5px;
-                font-size: 20px; font-weight: bold;
+                border: 2px solid #444; border-radius: 5px;
+                font-family: 'Segoe Ui'; font-size: 20px; 
+                font-weight: bold;
             }
-            QPushButton:hover { background-color: #444444; border: 1px solid #666; }
-            QPushButton:pressed { background-color: #000000; }
+            QPushButton:hover { background-color: #444444; border: 2px solid #666; }
         """
 
-        resume_btn = QPushButton("Resume")
-        settings_btn = QPushButton("Settings")
-        quit_btn = QPushButton("Quit")
+        resume_btn = QPushButton("RESUME")
+        settings_btn = QPushButton("SETTINGS")
+        quit_btn = QPushButton("QUIT")
 
         for btn in (resume_btn, settings_btn, quit_btn):
             btn.setFixedHeight(50)
