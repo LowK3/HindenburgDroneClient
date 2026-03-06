@@ -34,6 +34,7 @@
     <Compile Include="Utils\frame_buffer.py" />
     <Compile Include="Utils\__init__.py" />
     <Compile Include="Video\gui.py" />
+    <Compile Include="Video\help_widget.py" />
     <Compile Include="Video\settings_widget.py" />
     <Compile Include="Video\__init__.py" />
   </ItemGroup>

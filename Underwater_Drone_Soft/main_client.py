@@ -17,7 +17,7 @@ class ClientApp:
         net_thread = threading.Thread(target=net.run, daemon=True)
         net_thread.start()
 
-        # Start Qt GUI (Main Thread)
+        # Start Qt GUI
         app = QApplication(sys.argv)
         window = VideoWindow(self.fb, net.control)
 

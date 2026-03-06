@@ -1,12 +1,14 @@
 import cv2
 from PySide6.QtWidgets import (
     QMainWindow, QLabel, QPushButton, QVBoxLayout, 
-    QWidget, QGridLayout, QStackedLayout, QGraphicsBlurEffect
+    QWidget, QGridLayout, QStackedLayout, QGraphicsBlurEffect,
+    QCheckBox
 )
 from PySide6.QtCore import Qt, QTimer, QSettings
 from PySide6.QtGui import QImage, QPixmap, QAction
 from config import WINDOW_NAME
 from Video.settings_widget import SettingsWidget
+from Video.help_widget import HelpWidget
 
 class VideoWindow(QMainWindow):
     def __init__(self, frame_buffer, control_client):
@@ -37,6 +39,9 @@ class VideoWindow(QMainWindow):
         self.showMaximized()
         self.setFocusPolicy(Qt.StrongFocus)
         self.setFocus()
+
+        if self.settings.value("show_help_on_startup", True, type=bool):
+            self.show_help_overlay()
 
     def _setup_bindings(self):
         """ Initializes QSettings and loads saved keybinds. """
@@ -69,10 +74,10 @@ class VideoWindow(QMainWindow):
         self.video_layout.addWidget(self.video_label, 0, 0)
 
         # Waiting label
-        self.waiting_label = QLabel("Waiting for stream...", alignment=Qt.AlignCenter)
+        self.waiting_label = QLabel("WAITING FOR STREAM...", alignment=Qt.AlignCenter)
         self.waiting_label.setStyleSheet("""
-        font-family: 'Segoe Ui'; color: white; font-size: 40px; 
-        font-weight: bold; background: transparent;
+            font-family: 'Segoe Ui'; color: white; font-size: 40px; 
+            font-weight: bold; background: transparent;
         """)
         self.video_layout.addWidget(self.waiting_label, 0, 0, alignment=Qt.AlignCenter)
 
@@ -84,10 +89,25 @@ class VideoWindow(QMainWindow):
         self.menu_overlay.setGeometry(self.rect()) 
         self.menu_overlay.hide()
 
+        # Floating Help Button
+        self.help_button = QPushButton("HELP")
+        self.help_button.setFixedSize(90, 50)
+        self.help_button.setStyleSheet("""
+            QPushButton {
+                font-family: 'Segoe Ui'; background-color: #333; color: white;
+                border: 1px solid #444; border-radius: 5px;
+                font-size: 16px; font-weight: bold; margin: 10px;
+            }
+            QPushButton:hover { background-color: #444444; border: 1px solid #666; }
+        """)
+        self.video_layout.addWidget(self.help_button, 0, 0, alignment=Qt.AlignTop | Qt.AlignLeft)
+        self.help_button.clicked.connect(self.show_help_overlay)
+
     def _create_overlay(self):
         """ Builds the paused menu and links the settings widget. """
         overlay = QWidget(self.centralWidget())
-        overlay.setStyleSheet("background-color: rgba(40, 40, 40, 180);")
+        overlay.setObjectName("BaseOverlay")
+        overlay.setStyleSheet("#BaseOverlay { background-color: rgba(40, 40, 40, 180); }")
         self.overlay_stack = QStackedLayout(overlay)
 
         # PAGE 0: MAIN MENU
@@ -97,8 +117,8 @@ class VideoWindow(QMainWindow):
 
         menu_panel = QWidget()
         menu_panel.setObjectName("MenuPanel")
-        menu_panel.setStyleSheet("""#MenuPanel
-        { background-color: #1A1A1A; border-radius: 15px; border: 2px solid #333; }
+        menu_panel.setStyleSheet("""
+            #MenuPanel { background-color: #1A1A1A; border-radius: 15px; border: 2px solid #333; }
         """)
         menu_panel.setFixedWidth(350)
         
@@ -106,6 +126,14 @@ class VideoWindow(QMainWindow):
         menu_layout.setAlignment(Qt.AlignCenter)
         menu_layout.setSpacing(20)
         menu_layout.setContentsMargins(40, 40, 40, 40) 
+
+        title = QLabel("MAIN MENU")
+        title.setStyleSheet("""
+            font-family: 'Segoe Ui'; font-size: 30px; font-weight: bold;
+            color: white; margin-bottom: 18px; background: transparent;
+        """)
+        title.setAlignment(Qt.AlignCenter)
+        menu_layout.addWidget(title)
 
         button_style = """
             QPushButton {
@@ -137,8 +165,13 @@ class VideoWindow(QMainWindow):
         self.settings_page = SettingsWidget(self.bindings, self)
         self.settings_page.save_btn.clicked.connect(self.save_and_return)
 
+        # PAGE 2: HELP MENU
+        self.help_page = HelpWidget(self)
+        self.help_page.close_btn.clicked.connect(self.close_help_overlay)
+
         self.overlay_stack.addWidget(main_menu_widget)
         self.overlay_stack.addWidget(self.settings_page)
+        self.overlay_stack.addWidget(self.help_page)
 
         return overlay
 
@@ -208,9 +241,16 @@ class VideoWindow(QMainWindow):
 
     def toggle_overlay(self):
         if self.menu_overlay.isVisible():
-            self.video_label.setGraphicsEffect(None)
-            self.menu_overlay.hide()
-            self.overlay_stack.setCurrentIndex(0)
+            current_idx = self.overlay_stack.currentIndex()
+
+            if current_idx == 1:
+                self.overlay_stack.setCurrentIndex(0)
+            elif current_idx == 2:
+                self.close_help_overlay()
+            else:
+                self.video_label.setGraphicsEffect(None)
+                self.menu_overlay.hide()
+                self.overlay_stack.setCurrentIndex(0)
         else:
             blur = QGraphicsBlurEffect()
             blur.setBlurRadius(60)
@@ -276,3 +316,29 @@ class VideoWindow(QMainWindow):
             self.show_windowed_fullscreen()
         else:
             self.show_true_fullscreen()
+
+    # --- HELP OVERLAY MANAGEMENT ---
+    def show_help_overlay(self):
+        """ Opens the help menu and applies the background blur """
+        show_help = self.settings.value("show_help_on_startup", True, type=bool)
+        self.help_page.dont_show_cb.setChecked(not show_help)
+
+        if not self.menu_overlay.isVisible():
+            blur = QGraphicsBlurEffect()
+            blur.setBlurRadius(100)
+            self.video_container.setGraphicsEffect(blur)
+            
+            self.menu_overlay.setGeometry(self.centralWidget().rect())
+            self.menu_overlay.show()
+            self.menu_overlay.raise_()
+            
+        self.overlay_stack.setCurrentIndex(2)
+
+    def close_help_overlay(self):
+        """ Saves the checkbox preference and closes the menu """
+        dont_show = self.help_page.dont_show_cb.isChecked()
+        self.settings.setValue("show_help_on_startup", not dont_show)
+        
+        self.video_container.setGraphicsEffect(None)
+        self.menu_overlay.hide()
+        self.overlay_stack.setCurrentIndex(0)

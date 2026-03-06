@@ -25,16 +25,22 @@ class KeyGrabberButton(QPushButton):
         if self.current_key == 0:
             self.setText("UNBOUND")
             self.setStyleSheet("""
-            font-family: 'Segoe Ui'; background-color: #cc0000; 
-            color: white; padding: 5px; border-radius: 5px;
-            border: 1px solid #FF3336
+                QPushButton {
+                    font-family: 'Segoe Ui'; background-color: #cc0000; 
+                    color: white; padding: 5px; border-radius: 5px;
+                    border: 1px solid #FF3336; 
+                }
+                QPushButton:hover { background-color: #FF3336; border: 1px solid #FF6669; }
             """)
         else:
             self.setText(QKeySequence(self.current_key).toString())
             self.setStyleSheet("""
-            font-family: 'Segoe Ui'; background-color: #333; 
-            color: white; padding: 5px; border-radius: 5px;
-            border: 1px solid #444
+                QPushButton {
+                    font-family: 'Segoe Ui'; background-color: #333; 
+                    color: white; padding: 5px; border-radius: 5px;
+                    border: 1px solid #444;
+                }
+                QPushButton:hover { background-color: #444444; border: 1px solid #666; }
             """)
 
     def keyPressEvent(self, event):
@@ -60,9 +66,9 @@ class KeyGrabberButton(QPushButton):
             self.listening = True
             self.setText("PRESS ANY KEY...")
             self.setStyleSheet("""
-            font-family: 'Segoe Ui'; background-color: #DBDBDB; 
-            color: black; padding: 5px; border-radius: 5px;
-            border: 1px solid #444
+                font-family: 'Segoe Ui'; background-color: #DBDBDB; 
+                color: black; padding: 5px; border-radius: 5px;
+                border: 1px solid #444;
             """)
             self.setFocus()
 
@@ -87,8 +93,8 @@ class SettingsWidget(QWidget):
         
         title = QLabel("CONTROL SETTINGS")
         title.setStyleSheet("""
-        font-family: 'Segoe Ui'; font-size: 32px; font-weight: bold;
-        color: white; margin-bottom: 20px; background: transparent;
+            font-family: 'Segoe Ui'; font-size: 32px; font-weight: bold;
+            color: white; margin-bottom: 20px; background: transparent;
         """)
         title.setAlignment(Qt.AlignCenter)
         panel_layout.addWidget(title)
@@ -105,8 +111,8 @@ class SettingsWidget(QWidget):
             
             lbl = QLabel(CMD_LABELS[cmd] + "   ")
             lbl.setStyleSheet("""
-            font-family: 'Segoe Ui'; font-size: 17px; 
-            color: white; background: transparent;
+                font-family: 'Segoe Ui'; font-size: 17px; 
+                color: white; background: transparent;
             """)
             form_layout.addRow(lbl, btn)
             
