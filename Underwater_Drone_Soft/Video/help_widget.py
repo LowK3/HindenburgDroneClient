@@ -42,6 +42,7 @@ class HelpWidget(QWidget):
             "Ensure the drone is powered on and connected to the network before driving."
         )
         instructions.setWordWrap(True)
+        instructions.setMinimumHeight(200)
         instructions.setStyleSheet("""
             font-family: 'Segoe Ui'; font-size: 16px; color: white; 
             background: transparent;
