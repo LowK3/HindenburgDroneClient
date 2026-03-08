@@ -90,9 +90,9 @@ class VideoWindow(QMainWindow):
         self.menu_overlay.hide()
 
         # Floating Help Button
-        self.help_button = QPushButton("HELP")
-        self.help_button.setFixedSize(90, 50)
-        self.help_button.setStyleSheet("""
+        self.info_button = QPushButton("INFO")
+        self.info_button.setFixedSize(90, 50)
+        self.info_button.setStyleSheet("""
             QPushButton {
                 font-family: 'Segoe Ui'; background-color: #333; color: white;
                 border: 1px solid #444; border-radius: 5px;
@@ -100,8 +100,8 @@ class VideoWindow(QMainWindow):
             }
             QPushButton:hover { background-color: #444444; border: 1px solid #666; }
         """)
-        self.video_layout.addWidget(self.help_button, 0, 0, alignment=Qt.AlignTop | Qt.AlignLeft)
-        self.help_button.clicked.connect(self.show_help_overlay)
+        self.video_layout.addWidget(self.info_button, 0, 0, alignment=Qt.AlignTop | Qt.AlignLeft)
+        self.info_button.clicked.connect(self.show_help_overlay)
 
     def _create_overlay(self):
         """ Builds the paused menu and links the settings widget. """
@@ -166,12 +166,12 @@ class VideoWindow(QMainWindow):
         self.settings_page.save_btn.clicked.connect(self.save_and_return)
 
         # PAGE 2: HELP MENU
-        self.help_page = HelpWidget(self)
-        self.help_page.close_btn.clicked.connect(self.close_help_overlay)
+        self.info_page = HelpWidget(self)
+        self.info_page.close_btn.clicked.connect(self.close_help_overlay)
 
         self.overlay_stack.addWidget(main_menu_widget)
         self.overlay_stack.addWidget(self.settings_page)
-        self.overlay_stack.addWidget(self.help_page)
+        self.overlay_stack.addWidget(self.info_page)
 
         return overlay
 
@@ -321,7 +321,7 @@ class VideoWindow(QMainWindow):
     def show_help_overlay(self):
         """ Opens the help menu and applies the background blur """
         show_help = self.settings.value("show_help_on_startup", True, type=bool)
-        self.help_page.dont_show_cb.setChecked(not show_help)
+        self.info_page.dont_show_cb.setChecked(not show_help)
 
         if not self.menu_overlay.isVisible():
             blur = QGraphicsBlurEffect()
@@ -336,7 +336,7 @@ class VideoWindow(QMainWindow):
 
     def close_help_overlay(self):
         """ Saves the checkbox preference and closes the menu """
-        dont_show = self.help_page.dont_show_cb.isChecked()
+        dont_show = self.info_page.dont_show_cb.isChecked()
         self.settings.setValue("show_help_on_startup", not dont_show)
         
         self.video_container.setGraphicsEffect(None)
