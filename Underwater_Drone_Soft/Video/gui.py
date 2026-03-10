@@ -8,7 +8,7 @@ from PySide6.QtCore import Qt, QTimer, QSettings
 from PySide6.QtGui import QImage, QPixmap, QAction
 from config import WINDOW_NAME
 from Video.settings_widget import SettingsWidget
-from Video.help_widget import HelpWidget
+from Video.info_widget import InfoWidget
 
 class VideoWindow(QMainWindow):
     def __init__(self, frame_buffer, control_client):
@@ -40,8 +40,8 @@ class VideoWindow(QMainWindow):
         self.setFocusPolicy(Qt.StrongFocus)
         self.setFocus()
 
-        if self.settings.value("show_help_on_startup", True, type=bool):
-            self.show_help_overlay()
+        if self.settings.value("show_info_on_startup", True, type=bool):
+            self.show_info_overlay()
 
     def _setup_bindings(self):
         """ Initializes QSettings and loads saved keybinds. """
@@ -89,7 +89,7 @@ class VideoWindow(QMainWindow):
         self.menu_overlay.setGeometry(self.rect()) 
         self.menu_overlay.hide()
 
-        # Floating Help Button
+        # Floating Info Button
         self.info_button = QPushButton("INFO")
         self.info_button.setFixedSize(90, 50)
         self.info_button.setStyleSheet("""
@@ -101,9 +101,9 @@ class VideoWindow(QMainWindow):
             QPushButton:hover { background-color: #444444; border: 1px solid #666; }
         """)
         self.video_layout.addWidget(self.info_button, 0, 0, alignment=Qt.AlignTop | Qt.AlignLeft)
-        self.info_button.clicked.connect(self.show_help_overlay)
+        self.info_button.clicked.connect(self.show_info_overlay)
 
-        # CONNECTION STATUS HUD
+        # Connection Status Hud
         self.conn_panel = QWidget()
         self.conn_panel.setStyleSheet("""
             QWidget {
@@ -152,7 +152,7 @@ class VideoWindow(QMainWindow):
         overlay.setStyleSheet("#BaseOverlay { background-color: rgba(40, 40, 40, 180); }")
         self.overlay_stack = QStackedLayout(overlay)
 
-        # PAGE 0: MAIN MENU
+        # Page 0: MAIN MENU
         main_menu_widget = QWidget()
         main_outer_layout = QVBoxLayout(main_menu_widget)
         main_outer_layout.setAlignment(Qt.AlignCenter)
@@ -203,13 +203,13 @@ class VideoWindow(QMainWindow):
         settings_btn.clicked.connect(self.show_settings_page)
         quit_btn.clicked.connect(self.close)
 
-        # PAGE 1: SETTINGS MENU
+        # Page 1: SETTINGS MENU
         self.settings_page = SettingsWidget(self.bindings, self)
         self.settings_page.save_btn.clicked.connect(self.save_and_return)
 
-        # PAGE 2: HELP MENU
-        self.info_page = HelpWidget(self)
-        self.info_page.close_btn.clicked.connect(self.close_help_overlay)
+        # Page 2: INDO MENU
+        self.info_page = InfoWidget(self)
+        self.info_page.close_btn.clicked.connect(self.close_info_overlay)
 
         self.overlay_stack.addWidget(main_menu_widget)
         self.overlay_stack.addWidget(self.settings_page)
@@ -262,10 +262,6 @@ class VideoWindow(QMainWindow):
 
         key = event.key()
 
-        if key == Qt.Key_Escape:
-            self.toggle_overlay()
-            return
-
         cmd = self.key_to_cmd.get(key)
         if not cmd:
             return
@@ -295,19 +291,21 @@ class VideoWindow(QMainWindow):
             if current_idx == 1:
                 self.overlay_stack.setCurrentIndex(0)
             elif current_idx == 2:
-                self.close_help_overlay()
+                self.close_info_overlay()
             else:
                 self.video_label.setGraphicsEffect(None)
                 self.menu_overlay.hide()
                 self.overlay_stack.setCurrentIndex(0)
+                self.setFocus()
         else:
             blur = QGraphicsBlurEffect()
-            blur.setBlurRadius(60)
+            blur.setBlurRadius(100)
             self.video_container.setGraphicsEffect(blur)
 
             self.menu_overlay.setGeometry(self.centralWidget().rect())
             self.menu_overlay.show()
             self.menu_overlay.raise_()
+            self.setFocus()
 
     def resizeEvent(self, event):
         self.menu_overlay.setGeometry(self.rect())
@@ -367,6 +365,11 @@ class VideoWindow(QMainWindow):
         self.action_toggle_fullscreen.triggered.connect(self.toggle_fullscreen)
         self.addAction(self.action_toggle_fullscreen)
 
+        self.action_toggle_menu = QAction("Toggle Menu", self)
+        self.action_toggle_menu.setShortcut("Esc")
+        self.action_toggle_menu.triggered.connect(self.toggle_overlay)
+        self.addAction(self.action_toggle_menu)
+
     def show_windowed_fullscreen(self):
         self.is_true_fullscreen = False
         self.showMaximized()
@@ -381,11 +384,11 @@ class VideoWindow(QMainWindow):
         else:
             self.show_true_fullscreen()
 
-    # --- HELP OVERLAY MANAGEMENT ---
-    def show_help_overlay(self):
-        """ Opens the help menu and applies the background blur """
-        show_help = self.settings.value("show_help_on_startup", True, type=bool)
-        self.info_page.dont_show_cb.setChecked(not show_help)
+    # --- INFO OVERLAY MANAGEMENT ---
+    def show_info_overlay(self):
+        """ Opens the info menu and applies the background blur """
+        show_info = self.settings.value("show_info_on_startup", True, type=bool)
+        self.info_page.dont_show_cb.setChecked(not show_info)
 
         if not self.menu_overlay.isVisible():
             blur = QGraphicsBlurEffect()
@@ -398,10 +401,10 @@ class VideoWindow(QMainWindow):
             
         self.overlay_stack.setCurrentIndex(2)
 
-    def close_help_overlay(self):
+    def close_info_overlay(self):
         """ Saves the checkbox preference and closes the menu """
         dont_show = self.info_page.dont_show_cb.isChecked()
-        self.settings.setValue("show_help_on_startup", not dont_show)
+        self.settings.setValue("show_info_on_startup", not dont_show)
         
         self.video_container.setGraphicsEffect(None)
         self.menu_overlay.hide()
