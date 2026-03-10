@@ -4,7 +4,6 @@ from Utils.common import log
 
 class ControlClient:
     """ Client-side engine control link. """
-
     def __init__(self):
         self.sock = None
 

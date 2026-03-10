@@ -4,7 +4,6 @@ from Utils.common import log
 
 class DiscoveryClient:
     """Handles UDP broadcast discovery of the server."""
-
     def __init__(self):
         self.sock = None
 

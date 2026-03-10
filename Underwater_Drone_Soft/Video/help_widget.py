@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QCheckBox, QPushButt
 from PySide6.QtCore import Qt
 
 class HelpWidget(QWidget):
-    """ The help page with instructions. """
+    """ The info page with instructions. """
     def __init__(self, parent=None):
         super().__init__(parent)
         

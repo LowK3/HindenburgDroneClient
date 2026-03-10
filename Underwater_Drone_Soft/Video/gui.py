@@ -1,8 +1,8 @@
-import cv2
+﻿import cv2
 from PySide6.QtWidgets import (
     QMainWindow, QLabel, QPushButton, QVBoxLayout, 
     QWidget, QGridLayout, QStackedLayout, QGraphicsBlurEffect,
-    QCheckBox
+    QCheckBox, QHBoxLayout
 )
 from PySide6.QtCore import Qt, QTimer, QSettings
 from PySide6.QtGui import QImage, QPixmap, QAction
@@ -103,6 +103,48 @@ class VideoWindow(QMainWindow):
         self.video_layout.addWidget(self.info_button, 0, 0, alignment=Qt.AlignTop | Qt.AlignLeft)
         self.info_button.clicked.connect(self.show_help_overlay)
 
+        # CONNECTION STATUS HUD
+        self.conn_panel = QWidget()
+        self.conn_panel.setStyleSheet("""
+            QWidget {
+                background-color: #333; border: 1px solid #444;
+                border-radius: 5px; margin: 10px;
+            }
+            QLabel {
+                font-family: 'Segoe Ui'; background: transparent; color: white; font-size: 14px;
+                font-weight: bold; border: none; margin-left: 0px; margin-right: 0px;
+            }
+            QLabel#StatusDot {
+                min-width: 14px; min-height: 14px; 
+                max-width: 14px; max-height: 14px;
+                border-radius: 6px; 
+            }
+        """)
+        
+        conn_layout = QHBoxLayout(self.conn_panel)
+        conn_layout.setContentsMargins(20, 7, 20, 7)
+        conn_layout.setSpacing(5)
+
+        self.vid_dot = QLabel()
+        self.vid_dot.setFixedSize(12, 12)
+        self.vid_dot.setObjectName("StatusDot")
+        self.vid_dot.setStyleSheet("background-color: #FF3333;") 
+        self.vid_text = QLabel("VIDEO")
+
+        conn_layout.addWidget(self.vid_dot)
+        conn_layout.addWidget(self.vid_text)
+        conn_layout.addSpacing(25)
+
+        self.ctrl_dot = QLabel()
+        self.ctrl_dot.setObjectName("StatusDot")
+        self.ctrl_dot.setStyleSheet("background-color: #FF3333;") 
+        self.ctrl_text = QLabel("CONTROL")
+
+        conn_layout.addWidget(self.ctrl_dot)
+        conn_layout.addWidget(self.ctrl_text)
+
+        self.video_layout.addWidget(self.conn_panel, 0, 0, alignment=Qt.AlignTop | Qt.AlignRight)
+
     def _create_overlay(self):
         """ Builds the paused menu and links the settings widget. """
         overlay = QWidget(self.centralWidget())
@@ -182,7 +224,7 @@ class VideoWindow(QMainWindow):
             # Grabs the saved key, or uses the default if it doesn't exist yet
             self.bindings[cmd] = self.settings.value(cmd, default_key, type=int)
             
-        # Create a reverse dictionary (Key -> Command) for lightning fast lookups
+        # Create a reverse dictionary (Key -> Command) for fast lookups
         self.key_to_cmd = {v: k for k, v in self.bindings.items()}
 
     def save_bindings(self, new_bindings):
@@ -206,7 +248,13 @@ class VideoWindow(QMainWindow):
     def send_control(self):
         """ Sends the continuous heartbeat to the drone """
         if self.control and self.control.sock:
-            self.control.send(self.current_command)
+            self.update_control_status(True)
+            try:
+                self.control.send(self.current_command)
+            except Exception:
+                self.update_control_status(False)
+        else:
+            self.update_control_status(False)
 
     def keyPressEvent(self, event):
         if event.isAutoRepeat():
@@ -239,6 +287,7 @@ class VideoWindow(QMainWindow):
         if cmd in movement_cmds:
             self.current_command = "STOP\n"
 
+    # --- OVERLAY AND WINDOW MANAGEMENT ---
     def toggle_overlay(self):
         if self.menu_overlay.isVisible():
             current_idx = self.overlay_stack.currentIndex()
@@ -264,6 +313,19 @@ class VideoWindow(QMainWindow):
         self.menu_overlay.setGeometry(self.rect())
         super().resizeEvent(event)
 
+    # --- HUD STATUS UPDATES ---
+    def update_video_status(self, connected):
+        if connected:
+            self.vid_dot.setStyleSheet("background-color: #33FF33;")
+        else:
+            self.vid_dot.setStyleSheet("background-color: #FF3333;")
+
+    def update_control_status(self, connected):
+        if connected:
+            self.ctrl_dot.setStyleSheet("background-color: #33FF33;")
+        else:
+            self.ctrl_dot.setStyleSheet("background-color: #FF3333;")
+
     # --- VIDEO RENDERING ---
     def update_frame(self):
         if self.menu_overlay.isVisible():
@@ -278,9 +340,11 @@ class VideoWindow(QMainWindow):
         if frame is None:
             self.video_label.setPixmap(QPixmap())
             self.waiting_label.show()
+            self.update_video_status(False)
             return
 
         self.waiting_label.hide()
+        self.update_video_status(True)
 
         win_w = self.video_label.width()
         win_h = self.video_label.height()
