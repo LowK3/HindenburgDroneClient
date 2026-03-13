@@ -36,6 +36,7 @@
     <Compile Include="Video\gui.py" />
     <Compile Include="Video\info_widget.py" />
     <Compile Include="Video\settings_widget.py" />
+    <Compile Include="Video\tutorial_widget.py" />
     <Compile Include="Video\__init__.py" />
   </ItemGroup>
   <ItemGroup>
@@ -43,6 +44,12 @@
     <Folder Include="Control\" />
     <Folder Include="Video\" />
     <Folder Include="Utils\" />
+    <Folder Include="Video\assets\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Video\assets\1.jpg" />
+    <Content Include="Video\assets\2.jpg" />
+    <Content Include="Video\assets\3.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

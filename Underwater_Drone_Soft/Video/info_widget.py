@@ -56,6 +56,18 @@ class InfoWidget(QWidget):
             QCheckBox::indicator:checked { background-color: white; border-radius: 5px;}
         """)
         panel_layout.addWidget(self.dont_show_cb)
+
+        self.tutorial_btn = QPushButton("CONNECTION TUTORIAL")
+        self.tutorial_btn.setFixedHeight(50)
+        self.tutorial_btn.setStyleSheet("""
+            QPushButton {
+                font-family: 'Segoe Ui'; background-color: #333; color: white;
+                border: 2px solid #444; border-radius: 5px;
+                font-size: 18px; font-weight: bold; margin-top: 15px;
+            }
+            QPushButton:hover { background-color: #444444; border: 2px solid #666; }
+        """)
+        panel_layout.addWidget(self.tutorial_btn)
         
         self.close_btn = QPushButton("CLOSE")
         self.close_btn.setFixedHeight(50)
@@ -63,7 +75,7 @@ class InfoWidget(QWidget):
             QPushButton {
                 font-family: 'Segoe Ui'; background-color: #333; color: white;
                 border: 2px solid #444; border-radius: 5px;
-                font-size: 18px; font-weight: bold; margin-top: 15px;
+                font-size: 18px; font-weight: bold; margin-top: 10px;
             }
             QPushButton:hover { background-color: #444444; border: 2px solid #666; }
         """)

@@ -16,4 +16,4 @@ CON_INTERVAL = 0.5
 LOG_PREFIX = "[CLIENT]"
 
 """ Video display settings """
-WINDOW_NAME = "Submarine Stream"
+WINDOW_NAME = "Hindenburg Drone Controller"
