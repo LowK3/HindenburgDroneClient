@@ -10,6 +10,7 @@ from config import WINDOW_NAME
 from Video.settings_widget import SettingsWidget
 from Video.info_widget import InfoWidget
 from Video.tutorial_widget import TutorialWidget
+from config import UDP_TIMEOUT
 
 class VideoWindow(QMainWindow):
     def __init__(self, frame_buffer, control_client):
@@ -30,8 +31,13 @@ class VideoWindow(QMainWindow):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
-        self.timer.start(32)
+        self.timer.start(16)
         self.last_frame_time = time.time()
+
+        # FPS counter
+        self.fps_start_time = time.time()
+        self.fps_frame_count = 0
+        self.current_fps = 0
 
         # 2. Setup the User Interface
         self._setup_ui()
@@ -386,19 +392,29 @@ class VideoWindow(QMainWindow):
             self.update_video_status(False)
             return
 
-        # 3. THE WATCHDOG: Has it been more than 1 seconds since the last frame?
-        if time.time() - self.last_frame_time > 1:
-            self.video_label.setPixmap(QPixmap()) # Clear the frozen picture
-            self.waiting_label.show()             # Show the "WAITING" text
-            self.update_video_status(False)       # Turn the dot RED
+        if time.time() - self.last_frame_time > UDP_TIMEOUT:
+            self.video_label.setPixmap(QPixmap())
+            self.waiting_label.show()
+            self.update_video_status(False)
             return
 
-        # 4. If we don't have a new frame right this instant (but haven't timed out yet), just wait.
         if not has_new or frame is None:
             return
 
         self.waiting_label.hide()
         self.update_video_status(True)
+
+        # FPS counter for testing
+        self.fps_frame_count += 1
+        elapsed_time = time.time() - self.fps_start_time
+
+        if elapsed_time >= 1.0:
+            self.current_fps = self.fps_frame_count / elapsed_time
+            self.fps_frame_count = 0
+            self.fps_start_time = time.time()
+
+        fps_text = f"FPS: {int(self.current_fps)}"
+        cv2.putText(frame, fps_text, (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (50, 255, 50), 3)
 
         win_w = self.video_label.width()
         win_h = self.video_label.height()
