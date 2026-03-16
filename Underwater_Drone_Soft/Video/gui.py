@@ -1,4 +1,4 @@
-﻿import cv2
+﻿import cv2, time
 from PySide6.QtWidgets import (
     QMainWindow, QLabel, QPushButton, QVBoxLayout, 
     QWidget, QGridLayout, QStackedLayout, QGraphicsBlurEffect,
@@ -31,6 +31,7 @@ class VideoWindow(QMainWindow):
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
         self.timer.start(32)
+        self.last_frame_time = time.time()
 
         # 2. Setup the User Interface
         self._setup_ui()
@@ -372,15 +373,28 @@ class VideoWindow(QMainWindow):
             return 
 
         with self.fb.lock:
-            if not self.fb.new_frame: 
-                return
+            has_new = self.fb.new_frame
             frame = None if self.fb.frame is None else self.fb.frame.copy()
             self.fb.new_frame = False
+
+        if has_new:
+            self.last_frame_time = time.time()
 
         if frame is None:
             self.video_label.setPixmap(QPixmap())
             self.waiting_label.show()
             self.update_video_status(False)
+            return
+
+        # 3. THE WATCHDOG: Has it been more than 1 seconds since the last frame?
+        if time.time() - self.last_frame_time > 1:
+            self.video_label.setPixmap(QPixmap()) # Clear the frozen picture
+            self.waiting_label.show()             # Show the "WAITING" text
+            self.update_video_status(False)       # Turn the dot RED
+            return
+
+        # 4. If we don't have a new frame right this instant (but haven't timed out yet), just wait.
+        if not has_new or frame is None:
             return
 
         self.waiting_label.hide()
