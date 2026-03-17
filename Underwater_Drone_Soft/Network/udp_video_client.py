@@ -1,4 +1,4 @@
-import socket, struct, cv2, numpy as np, time, traceback
+import socket, struct, cv2, numpy as np, time, traceback, simplejpeg
 from config import UDP_VIDEO_PORT, DATA_WAIT
 from Utils.common import log
 
@@ -26,15 +26,15 @@ class VideoClient:
                 packet, addr = self.sock.recvfrom(65536)  # Buffer size large enough for UDP packet
                 self.last_data_time = time.time()
 
-                if len(packet) < 9: continue
+                if len(packet) < 7: continue
 
-                magic, frame_id, chunk_idx, total_chunks = struct.unpack("<BIHH", packet[:9])
+                magic, frame_id, chunk_idx, total_chunks = struct.unpack("<BIBB", packet[:7])
                 if magic != 0xAA: continue
 
                 if frame_id not in self.frame_buffer:
                     self.frame_buffer[frame_id] = {}
 
-                self.frame_buffer[frame_id][chunk_idx] = packet[9:]
+                self.frame_buffer[frame_id][chunk_idx] = packet[7:]
 
                 # If we have received all chunks for this frame
                 if len(self.frame_buffer[frame_id]) == total_chunks:
@@ -48,16 +48,8 @@ class VideoClient:
                         self.frame_buffer.clear()
 
                     try:
-                        np_arr = np.frombuffer(data, dtype=np.uint8)
-                        frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-                    
-                        if frame is None:
-                            print("[ERROR] OpenCV failed to decode frame.")
-                            return None
-                        return frame
-                    
-                    except Exception as e:
-                        log(f"[ERROR] Video Decode Exception: {e}")
+                        return simplejpeg.decode_jpeg(data, colorspace='RGB')
+                    except:
                         return None
 
             except socket.timeout:
