@@ -17,7 +17,7 @@ class VideoWindow(QMainWindow):
         super().__init__()
         self.fb = frame_buffer
         self.control = control_client
-        self.current_command = "STOP\n"
+        self.current_command = "STOP"
         self.is_true_fullscreen = False
 
         self.setWindowTitle(WINDOW_NAME)
@@ -55,10 +55,10 @@ class VideoWindow(QMainWindow):
         """ Initializes QSettings and loads saved keybinds. """
         self.settings = QSettings("UnderwaterDrone", "DroneClient")
         self.default_bindings = {
-            "W\n": Qt.Key_W, "S\n": Qt.Key_S, "A\n": Qt.Key_A, "D\n": Qt.Key_D,
-            "UP\n": Qt.Key_U, "DOWN\n": Qt.Key_J,
-            "REAR+\n": Qt.Key_O, "REAR-\n": Qt.Key_L,
-            "FRONT+\n": Qt.Key_I, "FRONT-\n": Qt.Key_K
+            "W": Qt.Key_W, "S": Qt.Key_S, "A": Qt.Key_A, "D": Qt.Key_D,
+            "UP": Qt.Key_U, "DOWN": Qt.Key_J,
+            "REAR+": Qt.Key_O, "REAR-": Qt.Key_L,
+            "FRONT+": Qt.Key_I, "FRONT-": Qt.Key_K
         }
         self.bindings = {}
         self.key_to_cmd = {}
@@ -264,7 +264,7 @@ class VideoWindow(QMainWindow):
         if self.control and self.control.sock:
             self.update_control_status(True)
             try:
-                self.control.send(self.current_command)
+                self.control.send({"cmd": self.current_command})
             except Exception:
                 self.update_control_status(False)
         else:
@@ -280,11 +280,11 @@ class VideoWindow(QMainWindow):
         if not cmd:
             return
 
-        movement_cmds = {"W\n", "S\n", "A\n", "D\n", "UP\n", "DOWN\n"}
+        movement_cmds = {"W", "S", "A", "D", "UP", "DOWN"}
         if cmd in movement_cmds:
             self.current_command = cmd
         else:
-            self.control.send(cmd)
+            self.control.send({"cmd": cmd})
 
     def keyReleaseEvent(self, event):
         if event.isAutoRepeat(): 
@@ -293,9 +293,9 @@ class VideoWindow(QMainWindow):
         key = event.key()
         cmd = self.key_to_cmd.get(key)
             
-        movement_cmds = {"W\n", "S\n", "A\n", "D\n", "UP\n", "DOWN\n"}
+        movement_cmds = {"W", "S", "A", "D", "UP", "DOWN"}
         if cmd in movement_cmds:
-            self.current_command = "STOP\n"
+            self.current_command = "STOP"
 
     # --- OVERLAY AND WINDOW MANAGEMENT ---
     def toggle_overlay(self):

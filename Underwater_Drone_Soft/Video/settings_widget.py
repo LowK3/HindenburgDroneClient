@@ -5,10 +5,10 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeySequence
 
 CMD_LABELS = {
-    "W\n": "FORWARD", "S\n": "BACKWARD", "A\n": "TURN LEFT", "D\n": "TURN RIGHT",
-    "UP\n": "TILT UP", "DOWN\n": "TILT DOWN",
-    "REAR+\n": "REAR POWER +", "REAR-\n": "REAR POWER -",
-    "FRONT+\n": "FRONT POWER +", "FRONT-\n": "FRONT POWER -"
+    "W": "FORWARD", "S": "BACKWARD", "A": "TURN LEFT", "D": "TURN RIGHT",
+    "UP": "TILT UP", "DOWN": "TILT DOWN",
+    "REAR+": "REAR POWER +", "REAR-": "REAR POWER -",
+    "FRONT+": "FRONT POWER +", "FRONT-": "FRONT POWER -"
 }
 
 class KeyGrabberButton(QPushButton):

@@ -1,4 +1,4 @@
-import socket, traceback
+import socket, traceback, json
 from config import CONTROL_TCP_PORT, CONTROL_TIMEOUT
 from Utils.common import log
 
@@ -20,11 +20,12 @@ class ControlClient:
             self.sock = None
             return False
 
-    def send(self, cmd: str):
+    def send(self, payload: dict):
         if not self.sock:
             return
         try:
-            self.sock.sendall(cmd.encode())
+            data_str = json.dumps(payload) + "\n"
+            self.sock.sendall(data_str.encode())
         except Exception as e:
             log(f"Control send error: {e}\n{traceback.format_exc()}")
             self.sock = None
