@@ -10,6 +10,7 @@ from config import WINDOW_NAME
 from Video.settings_widget import SettingsWidget
 from Video.info_widget import InfoWidget
 from Video.tutorial_widget import TutorialWidget
+from Video.confirm_widget import ConfirmWidget
 from config import UDP_TIMEOUT
 
 class VideoWindow(QMainWindow):
@@ -229,6 +230,13 @@ class VideoWindow(QMainWindow):
         self.overlay_stack.addWidget(self.info_page)
         self.overlay_stack.addWidget(self.tutorial_page)
 
+        # Overlay: CONFIRMATION DIALOG
+        self.confirm_overlay = ConfirmWidget(overlay)
+        self.confirm_overlay.hide()
+
+        self.confirm_overlay.accepted.connect(self.confirm_save_yes)
+        self.confirm_overlay.rejected.connect(self.confirm_save_no)
+
         return overlay
 
     # --- SETTINGS MANAGEMENT ---
@@ -257,6 +265,15 @@ class VideoWindow(QMainWindow):
         self.save_bindings(new_bindings)
         self.overlay_stack.setCurrentIndex(0)
         print("[DEBUG] Keybindings saved successfully!")
+
+    def confirm_save_yes(self):
+        self.save_and_return()
+        self.confirm_overlay.hide()
+        
+    def confirm_save_no(self):
+        self.settings_page.revert_changes()
+        self.overlay_stack.setCurrentIndex(0)
+        self.confirm_overlay.hide()
 
     # --- CONTROL & EVENTS ---
     def send_control(self):
@@ -300,10 +317,20 @@ class VideoWindow(QMainWindow):
     # --- OVERLAY AND WINDOW MANAGEMENT ---
     def toggle_overlay(self):
         if self.menu_overlay.isVisible():
+            if hasattr(self, 'confirm_overlay') and self.confirm_overlay.isVisible():
+                self.confirm_overlay.hide()
+                return
+
             current_idx = self.overlay_stack.currentIndex()
 
             if current_idx == 1:
-                self.overlay_stack.setCurrentIndex(0)
+                if self.settings_page.has_unsaved_changes():
+                    self.confirm_overlay.setGeometry(self.menu_overlay.rect())
+                    self.confirm_overlay.show()
+                    self.confirm_overlay.raise_()
+                    return
+                else:
+                    self.overlay_stack.setCurrentIndex(0)
             elif current_idx == 2:
                 self.close_info_page()
             elif current_idx == 3:
@@ -325,6 +352,8 @@ class VideoWindow(QMainWindow):
 
     def resizeEvent(self, event):
         self.menu_overlay.setGeometry(self.rect())
+        if hasattr(self, 'confirm_overlay'):
+            self.confirm_overlay.setGeometry(self.rect())
         super().resizeEvent(event)
 
     def show_info_page(self):

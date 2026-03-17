@@ -33,6 +33,7 @@
     <Compile Include="Utils\common.py" />
     <Compile Include="Utils\frame_buffer.py" />
     <Compile Include="Utils\__init__.py" />
+    <Compile Include="Video\confirm_widget.py" />
     <Compile Include="Video\gui.py" />
     <Compile Include="Video\info_widget.py" />
     <Compile Include="Video\settings_widget.py" />

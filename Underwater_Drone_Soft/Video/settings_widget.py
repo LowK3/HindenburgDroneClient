@@ -149,6 +149,22 @@ class SettingsWidget(QWidget):
         target_btn.update_display()
 
     def get_new_bindings(self):
+        self.reset_all_grabbers()
         for cmd, btn in self.buttons.items():
             self.bindings[cmd] = btn.current_key
         return self.bindings
+
+    def has_unsaved_changes(self):
+        """ Checks if any buttons current key differs from the saved binding. """
+        self.reset_all_grabbers()
+        for cmd, btn in self.buttons.items():
+            if self.bindings[cmd] != btn.current_key:
+                return True
+        return False
+
+    def revert_changes(self):
+        """ Discards changes and resets buttons to their last saved state. """
+        self.reset_all_grabbers()
+        for cmd, btn in self.buttons.items():
+            btn.current_key = self.bindings[cmd]
+            btn.update_display()

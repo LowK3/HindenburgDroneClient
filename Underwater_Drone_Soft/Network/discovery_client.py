@@ -16,7 +16,6 @@ class DiscoveryClient:
 
     def discover(self):
         """Broadcast PC_CLIENT and wait for PI_SERVER:<port> response."""
-
         try:
             if self.sock is None:
                 self.sock = self.create_socket()
