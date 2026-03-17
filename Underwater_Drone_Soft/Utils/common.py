@@ -17,7 +17,7 @@ file_handler = RotatingFileHandler(
     backupCount = 2
 )
 
-formatter = logging.Formatter("{CLIENT} [%(asctime)s] | %(message)s", datefmt="%H:%M:%S")
+formatter = logging.Formatter("[CLIENT] [%(asctime)s] | %(message)s", datefmt="%H:%M:%S")
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
