@@ -1,4 +1,4 @@
-import sys, time, logging, os
+import sys, time, logging, os, traceback
 from logging.handlers import RotatingFileHandler
 from config import LOG_PREFIX
 
@@ -34,3 +34,15 @@ def recv_all(sock, n):
             raise ConnectionResetError("Socket closed.")
         data += chunk
     return data
+
+def global_crash_handler(exc_type, exc_value, exc_tb):
+    """ Catches any fatal crash in the app and saves it to the log file. """
+    # Ignore normal manual shutdowns (like pressing Ctrl+C)
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_tb)
+        return
+        
+    crash_report = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
+    log(f"CRITICAL APP CRASH:\n{crash_report}")
+
+sys.excepthook = global_crash_handler

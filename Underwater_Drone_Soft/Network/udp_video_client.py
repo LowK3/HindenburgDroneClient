@@ -51,7 +51,6 @@ class VideoClient:
                         return simplejpeg.decode_jpeg(data, colorspace='RGB')
                     except:
                         return None
-
             except socket.timeout:
                 if time.time() - self.last_data_time > DATA_WAIT:
                     raise TimeoutError("No video data from server.")

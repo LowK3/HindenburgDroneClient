@@ -20,7 +20,6 @@ class DiscoveryClient:
             if self.sock is None:
                 self.sock = self.create_socket()
 
-            # log("Broadcasting discovery packet...")
             self.sock.sendto(b"PC_CLIENT", ("<broadcast>", UDP_PORT))
 
             start = time.time()
@@ -39,7 +38,7 @@ class DiscoveryClient:
                         continue
                     log(f"Discovered server at {addr[0]}:{port}")
                     return addr[0], port
-            log("No discovery reply received")
+            print("No discovery reply received")
         except Exception as e:
             log(f"Discovery error: {e}\n{traceback.format_exc()}")
         finally:
@@ -50,8 +49,7 @@ class DiscoveryClient:
         if self.sock:
             try:
                 self.sock.close()
-                log("UDP discovery socket closed.")
+                print("UDP discovery socket closed.")
             except Exception as e:
                 log(f"Error closing UDP socket: {e}\n{traceback.format_exc()}")
             self.sock = None
-        time.sleep(CON_INTERVAL)

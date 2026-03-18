@@ -14,7 +14,7 @@ class NetworkWorker:
         self.control = ControlClient()
 
     def run(self):
-        log("Network started.")
+        log("Network worker started. Searching for drone...")
 
         while not self.stop_event.is_set():
             # Discovery server
@@ -33,6 +33,8 @@ class NetworkWorker:
                 self.video.stop()
                 time.sleep(CON_INTERVAL)
                 continue
+
+            log(f"Fully connected to Drone at {ip}.")
 
             # Streaming loop
             while not self.stop_event.is_set():

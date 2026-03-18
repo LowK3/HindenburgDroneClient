@@ -6,12 +6,12 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QTimer, QSettings
 from PySide6.QtGui import QImage, QPixmap, QAction
-from config import WINDOW_NAME
 from Video.settings_widget import SettingsWidget
 from Video.info_widget import InfoWidget
 from Video.tutorial_widget import TutorialWidget
 from Video.confirm_widget import ConfirmWidget
-from config import UDP_TIMEOUT
+from Utils.common import log
+from config import WINDOW_NAME, UDP_TIMEOUT
 
 class VideoWindow(QMainWindow):
     def __init__(self, frame_buffer, control_client):
@@ -264,7 +264,7 @@ class VideoWindow(QMainWindow):
         new_bindings = self.settings_page.get_new_bindings()
         self.save_bindings(new_bindings)
         self.overlay_stack.setCurrentIndex(0)
-        print("[DEBUG] Keybindings saved successfully!")
+        log(f"New keybinds saved successfully: {new_bindings}")
 
     def confirm_save_yes(self):
         self.save_and_return()

@@ -16,7 +16,7 @@ class ControlClient:
             log(f"Control TCP connected to {ip}:{CONTROL_TCP_PORT}.")
             return True
         except Exception as e:
-            log(f"Control TCP connect failed: {e}\n{traceback.format_exc()}")
+            log(f"Control TCP connection failed: {e}\n{traceback.format_exc()}")
             self.sock = None
             return False
 
