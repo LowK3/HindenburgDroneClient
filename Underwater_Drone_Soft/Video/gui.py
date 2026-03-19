@@ -50,19 +50,18 @@ class VideoWindow(QMainWindow):
 
     def _setup_ui(self):
         """ Builds the main video layouts and overlay stack. """
-        #central = QWidget()
-        #self.setCentralWidget(central)
+        central = QWidget()
+        self.setCentralWidget(central)
 
         # Video container
         self.video_container = QWidget()
-        self.setCentralWidget(self.video_container)
         self.video_layout = QGridLayout(self.video_container)
         self.video_layout.setContentsMargins(0, 0, 0, 0)
 
-        # --- KAS ON VAJA???? ---
-        #central.setLayout(QVBoxLayout())
-        #central.layout().setContentsMargins(0, 0, 0, 0)
-        #central.layout().addWidget(self.video_container)
+        # Make the video container fill the entire window
+        central.setLayout(QVBoxLayout())
+        central.layout().setContentsMargins(0, 0, 0, 0)
+        central.layout().addWidget(self.video_container)
 
         self.video_label = QLabel(alignment=Qt.AlignCenter)
         self.video_label.setStyleSheet("background-color: #0D0D0D;")
@@ -72,8 +71,6 @@ class VideoWindow(QMainWindow):
         self.waiting_label = QLabel("WAITING FOR STREAM...", alignment=Qt.AlignCenter)
         self.waiting_label.setStyleSheet(WAITING_TITLE)
         self.video_layout.addWidget(self.waiting_label, 0, 0, alignment=Qt.AlignCenter)
-
-        # self.stack.addWidget(self.video_container)
 
         # Menu overlay setup
         self.overlay = OverlayManager(self)

@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QStackedLayout, QLabel, 
-    QPushButton
+    QPushButton, QGraphicsBlurEffect
 )
 from PySide6.QtCore import Qt
 from Video.main_menu_widget import MainMenuWidget
@@ -16,6 +16,7 @@ class OverlayManager(QWidget):
     def __init__(self, main_window):
         super().__init__(main_window.centralWidget())
         self.main = main_window
+        self.setAttribute(Qt.WA_StyledBackground, True)
 
         self.setObjectName("BaseOverlay")
         self.setStyleSheet("#BaseOverlay { background-color: rgba(40, 40, 40, 180); }")
@@ -55,6 +56,16 @@ class OverlayManager(QWidget):
         self.confirm_overlay.accepted.connect(self.confirm_save_yes)
         self.confirm_overlay.rejected.connect(self.confirm_save_no)
 
+    # --- BACKGROUND EFFECTS ---
+    def _apply_background_blur(self):
+        """ Blurs the entire video layer (feed, HUD, and buttons). """
+        blur_effect = QGraphicsBlurEffect(self.main.video_container)
+        blur_effect.setBlurRadius(10)
+        self.main.video_container.setGraphicsEffect(blur_effect)
+
+    def _remove_background_blur(self):
+        self.main.video_container.setGraphicsEffect(None)
+
     # --- VISIBILITY & LOGIC ---
     def toggle_menu(self):
         if self.isVisible():
@@ -82,6 +93,7 @@ class OverlayManager(QWidget):
                 self.main.setFocus()
         else:
             self.setGeometry(self.main.centralWidget().rect())
+            self._apply_background_blur()
             self.show()
             self.raise_()
             self.main.setFocus()
@@ -98,6 +110,7 @@ class OverlayManager(QWidget):
 
         if not self.isVisible():
             self.setGeometry(self.main.centralWidget().rect())
+            self._apply_background_blur()
             self.show()
             self.raise_()
         self.overlay_stack.setCurrentIndex(2)
@@ -106,6 +119,7 @@ class OverlayManager(QWidget):
         dont_show = self.info_page.dont_show_cb.isChecked()
         self.main.input.settings.setValue("show_info_on_startup", not dont_show)
         self.main.video_container.setGraphicsEffect(None)
+        self._remove_background_blur()
         self.hide()
         self.overlay_stack.setCurrentIndex(0)
 
