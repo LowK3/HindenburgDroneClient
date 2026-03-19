@@ -43,15 +43,16 @@ class TutorialWidget(QWidget):
         steps = [
             ("1. POWER ON", "Plug the power bank into the Raspberry Pi to start the drone."),
             ("2. CONNECT ETHERNET CABLE", "Connect the drone to your computer via the Ethernet cable."),
-            ("3. OPEN PuTTY", "Connect to the Raspberry Pi using PuTTY and an SSH link. (Host Name: server)"),
-            ("4. START THE SERVER", "Start the server on the drone using the PuTTY terminal. Navigate to the "
-             "Server repository and start the server using\n'python3 main_server'.\n"
+            ("3. OPEN PuTTY", "Establish an SSH connection to the Raspberry Pi using PuTTY (Host Name: server)."),
+            ("4. START THE SERVER", "In the PuTTY terminal, navigate to the server repository and run:\n"
+             "  'python3 main_server.py'\n\n"
              "(Note: In the future, the server will start automatically when Raspberry is powered on)."),
-            ("5. CONNECT", "Turn on the Hindenburg Windows app. The connection between the drone and "
+            ("5. CONNECT", "Launch the Hindenburg Windows application. The connection between the drone and "
              "server will be established automatically."),
-            ("6. READY TO DIVE", "Check the top right indicators. If VIDEO and CONTROL are green, you are ready to drive!"),
-            ("TROUBLE CONNECTING?", "If you have trouble connecting, you can see the log files in the "
-             "Documents folder on your computer and the server logs from the PuTTY in the Linux home folder.")
+            ("6. READY TO DIVE", "Check the status indicators in the top right. When VIDEO and CONTROL turn green, you are ready to dive!"),
+            ("TROUBLE CONNECTING?", "If you have trouble connecting, or run into any issues, check the Logs for errors."),
+            ("App Logs", "Click the 'LOGS' button in the Main Menu to instantly view your client side logs or navigate to the main folder of the App."),
+            ("Server Logs", "Open PuTTY and navigate to the main folder of the Server to open and check the Log file on the Raspberry Pi.")
         ]
         
         for i, (step_title, step_text) in enumerate(steps):
@@ -64,7 +65,7 @@ class TutorialWidget(QWidget):
             desc_lbl.setStyleSheet(TEXT)
             scroll_layout.addWidget(desc_lbl)
             
-            if i < len(steps) - 1:
+            if i < len(steps) - 3:
                 img_label = QLabel()
                 img_label.setAlignment(Qt.AlignCenter)
                 img_label.setFixedHeight(400)
@@ -81,7 +82,7 @@ class TutorialWidget(QWidget):
             
                 scroll_layout.addWidget(img_label)
 
-            if i < len(steps) - 1:
+            if i < len(steps) - 3:
                 line = QFrame()
                 line.setFrameShape(QFrame.HLine)
                 line.setStyleSheet(f"background-color: {BTN_BG_COLOR}")

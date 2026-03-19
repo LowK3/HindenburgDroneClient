@@ -32,14 +32,16 @@ class InfoWidget(QWidget):
         panel_layout.addWidget(welcome)
 
         instructions = QLabel(
-            "- Use the W, A, S, D keys to drive the drone.\n"
-            "- Use U and J to tilt the drone up and down.\n"
-            "- Press 'Esc' to pause the stream and open the menu.\n"
-            "- You can change your keybindings in the Settings menu.\n\n"
-            "Ensure the drone is powered on and connected to the network before driving."
+            "Default Controls:\n"
+            "- Drive: W, A, S, D\n"
+            "- Tilt: U (Up) and J (Down)\n"
+            "- Front Power: I (Increase) and K (Decrease)\n"
+            "- Rear Power: O (Increase) and L (Decrease)\n\n"
+            "Press 'Esc' to open the menu and configure custom keybindings in the Settings tab.\n\n"
+            "Important: Ensure the drone is fully powered on and connected to the Server before driving."
         )
         instructions.setWordWrap(True)
-        instructions.setMinimumHeight(200)
+        instructions.setMinimumHeight(250)
         instructions.setStyleSheet(TEXT)
         panel_layout.addWidget(instructions)
         
