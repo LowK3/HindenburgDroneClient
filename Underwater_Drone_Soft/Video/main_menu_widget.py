@@ -5,6 +5,7 @@ from Video.styles import MAIN_PANEL_STYLE, TITLE_TEXT, MENU_BTN_STYLE
 class MainMenuWidget(QWidget):
     resume_clicked = Signal()
     settings_clicked = Signal()
+    logs_clicked = Signal()
     quit_clicked = Signal()
 
     def __init__(self, parent=None):
@@ -30,9 +31,10 @@ class MainMenuWidget(QWidget):
 
         self.resume_btn = QPushButton("RESUME")
         self.settings_btn = QPushButton("SETTINGS")
+        self.logs_btn = QPushButton("LOGS")
         self.quit_btn = QPushButton("QUIT")
 
-        for btn in (self.resume_btn, self.settings_btn, self.quit_btn):
+        for btn in (self.resume_btn, self.settings_btn, self.logs_btn, self.quit_btn):
             btn.setFixedHeight(50)
             btn.setFixedWidth(200)
             btn.setStyleSheet(MENU_BTN_STYLE)
@@ -43,4 +45,5 @@ class MainMenuWidget(QWidget):
         # Connect button clicks to the signals
         self.resume_btn.clicked.connect(self.resume_clicked.emit)
         self.settings_btn.clicked.connect(self.settings_clicked.emit)
+        self.logs_btn.clicked.connect(self.logs_clicked.emit)
         self.quit_btn.clicked.connect(self.quit_clicked.emit)

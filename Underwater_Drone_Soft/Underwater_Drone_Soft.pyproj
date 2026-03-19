@@ -34,6 +34,7 @@
     <Compile Include="Utils\common.py" />
     <Compile Include="Utils\display_func.py" />
     <Compile Include="Utils\frame_buffer.py" />
+    <Compile Include="Utils\logger.py" />
     <Compile Include="Utils\__init__.py" />
     <Compile Include="Video\confirm_widget.py" />
     <Compile Include="Video\connection_hud.py" />

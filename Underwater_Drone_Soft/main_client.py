@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QApplication
 from Video.gui import VideoWindow
 from Utils.frame_buffer import FrameBuffer
 from Network.network_worker import NetworkWorker
-from Utils.common import log
+from Utils.logger import log
 
 class ClientApp:
     def __init__(self):

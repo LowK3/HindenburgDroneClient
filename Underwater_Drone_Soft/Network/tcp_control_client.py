@@ -1,6 +1,6 @@
 import socket, traceback, json
 from config import CONTROL_TCP_PORT, CONTROL_TIMEOUT
-from Utils.common import log
+from Utils.logger import log
 
 class ControlClient:
     """ Client-side engine control link. """

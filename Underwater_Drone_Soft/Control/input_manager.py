@@ -1,5 +1,5 @@
 from PySide6.QtCore import QObject, QTimer, Qt, QSettings
-from Utils.common import log
+from Utils.logger import log
 
 class InputManager(QObject):
     """ Handles keybinds, saving settings, and sending network commands. """

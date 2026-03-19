@@ -8,7 +8,7 @@ from Video.settings_widget import SettingsWidget
 from Video.info_widget import InfoWidget
 from Video.tutorial_widget import TutorialWidget
 from Video.confirm_widget import ConfirmWidget
-from Utils.common import log
+from Utils.logger import log, open_logs_file
 from Video.styles import MAIN_PANEL_STYLE, TITLE_TEXT, MENU_BTN_STYLE
 
 class OverlayManager(QWidget):
@@ -30,6 +30,7 @@ class OverlayManager(QWidget):
         self.main_menu_widget = MainMenuWidget(self)
         self.main_menu_widget.resume_clicked.connect(self.toggle_menu)
         self.main_menu_widget.settings_clicked.connect(lambda: self.overlay_stack.setCurrentIndex(1))
+        self.main_menu_widget.logs_clicked.connect(open_logs_file)
         self.main_menu_widget.quit_clicked.connect(self.main.close)
 
         # Page 1: SETTINGS MENU
@@ -56,7 +57,7 @@ class OverlayManager(QWidget):
         self.confirm_overlay.accepted.connect(self.confirm_save_yes)
         self.confirm_overlay.rejected.connect(self.confirm_save_no)
 
-    # --- BACKGROUND EFFECTS ---
+    # --- BACKGROUND BLUR EFFECTS ---
     def _apply_background_blur(self):
         """ Blurs the entire video layer (feed, HUD, and buttons). """
         blur_effect = QGraphicsBlurEffect(self.main.video_container)

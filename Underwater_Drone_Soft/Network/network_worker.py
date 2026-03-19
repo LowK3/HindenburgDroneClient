@@ -2,8 +2,8 @@ import time, threading, traceback
 from Network.discovery_client import DiscoveryClient
 from Network.udp_video_client import VideoClient
 from Network.tcp_control_client import ControlClient
-from Utils.common import log
 from config import CON_INTERVAL
+from Utils.logger import log
 
 class NetworkWorker:
     def __init__(self, frame_buffer, stop_event):

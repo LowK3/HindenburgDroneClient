@@ -9,7 +9,7 @@ from Video.overlay_manager import OverlayManager
 from Control.input_manager import InputManager
 from Video.connection_hud import ConnectionHud
 from Utils.display_func import create_qpixmap
-from Utils.common import log
+from Utils.logger import log
 from config import WINDOW_NAME, UDP_TIMEOUT
 from Video.styles import (
     MAIN_PANEL_STYLE, CONNECTION_PANEL_STYLE, INFO_BTN_STYLE, ACCENT_GREEN, ACCENT_RED, 

@@ -1,6 +1,6 @@
 import socket, time, traceback
 from config import UDP_PORT, UDP_TIMEOUT, CON_INTERVAL
-from Utils.common import log
+from Utils.logger import log
 
 class DiscoveryClient:
     """Handles UDP broadcast discovery of the server."""

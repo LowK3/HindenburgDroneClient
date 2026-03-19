@@ -1,6 +1,6 @@
 import socket, struct, cv2, numpy as np, time, traceback, simplejpeg
 from config import UDP_VIDEO_PORT, DATA_WAIT
-from Utils.common import log
+from Utils.logger import log
 
 class VideoClient:
     def __init__(self):
