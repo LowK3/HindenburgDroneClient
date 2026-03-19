@@ -23,6 +23,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="config.py" />
+    <Compile Include="Control\input_manager.py" />
     <Compile Include="Control\__init__.py" />
     <Compile Include="main_client.py" />
     <Compile Include="Network\discovery_client.py" />
@@ -31,12 +32,17 @@
     <Compile Include="Network\udp_video_client.py" />
     <Compile Include="Network\__init__.py" />
     <Compile Include="Utils\common.py" />
+    <Compile Include="Utils\display_func.py" />
     <Compile Include="Utils\frame_buffer.py" />
     <Compile Include="Utils\__init__.py" />
     <Compile Include="Video\confirm_widget.py" />
+    <Compile Include="Video\connection_hud.py" />
     <Compile Include="Video\gui.py" />
     <Compile Include="Video\info_widget.py" />
+    <Compile Include="Video\main_menu_widget.py" />
+    <Compile Include="Video\overlay_manager.py" />
     <Compile Include="Video\settings_widget.py" />
+    <Compile Include="Video\styles.py" />
     <Compile Include="Video\tutorial_widget.py" />
     <Compile Include="Video\__init__.py" />
   </ItemGroup>
@@ -51,6 +57,7 @@
     <Content Include="Video\assets\1.jpg" />
     <Content Include="Video\assets\2.jpg" />
     <Content Include="Video\assets\3.jpg" />
+    <Content Include="Video\assets\6.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

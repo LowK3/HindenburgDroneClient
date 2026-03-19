@@ -1,8 +1,12 @@
 from PySide6.QtWidgets import (
     QPushButton, QWidget, QVBoxLayout, QLabel, QFormLayout
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QKeySequence
+from Video.styles import (
+    MAIN_PANEL_STYLE, TITLE_TEXT, TEXT, BTN_STYLE, SMALL_BTN_STYLE, 
+    UNBOUND_BTN_STYLE, PRESS_KEY_STYLE
+)
 
 CMD_LABELS = {
     "W": "FORWARD", "S": "BACKWARD", "A": "TURN LEFT", "D": "TURN RIGHT",
@@ -24,24 +28,10 @@ class KeyGrabberButton(QPushButton):
     def update_display(self):
         if self.current_key == 0:
             self.setText("UNBOUND")
-            self.setStyleSheet("""
-                QPushButton {
-                    font-family: 'Segoe Ui'; background-color: #cc0000; 
-                    color: white; padding: 5px; border-radius: 5px;
-                    border: 1px solid #FF3336; 
-                }
-                QPushButton:hover { background-color: #FF3336; border: 1px solid #FF6669; }
-            """)
+            self.setStyleSheet(UNBOUND_BTN_STYLE)
         else:
             self.setText(QKeySequence(self.current_key).toString())
-            self.setStyleSheet("""
-                QPushButton {
-                    font-family: 'Segoe Ui'; background-color: #333; 
-                    color: white; padding: 5px; border-radius: 5px;
-                    border: 1px solid #444;
-                }
-                QPushButton:hover { background-color: #444444; border: 1px solid #666; }
-            """)
+            self.setStyleSheet(SMALL_BTN_STYLE)
 
     def keyPressEvent(self, event):
         if self.listening:
@@ -65,15 +55,13 @@ class KeyGrabberButton(QPushButton):
         if not was_listening:
             self.listening = True
             self.setText("PRESS ANY KEY...")
-            self.setStyleSheet("""
-                font-family: 'Segoe Ui'; background-color: #DBDBDB; 
-                color: black; padding: 5px; border-radius: 5px;
-                border: 1px solid #444;
-            """)
+            self.setStyleSheet(PRESS_KEY_STYLE)
             self.setFocus()
 
 class SettingsWidget(QWidget):
     """ The in-overlay settings page for changing keybinds. """
+    save_clicked = Signal()
+
     def __init__(self, current_bindings, parent=None):
         super().__init__(parent)
         self.bindings = current_bindings.copy()
@@ -83,8 +71,8 @@ class SettingsWidget(QWidget):
         outer_layout.setAlignment(Qt.AlignCenter)
         
         self.panel = QWidget()
-        self.panel.setObjectName("SolidPanel")
-        self.panel.setStyleSheet("#SolidPanel { background-color: #1A1A1A; border-radius: 15px; border: 2px solid #333; }")
+        self.panel.setObjectName("SettingsPanel")
+        self.panel.setStyleSheet(MAIN_PANEL_STYLE)
         self.panel.setFixedWidth(450)
         
         panel_layout = QVBoxLayout(self.panel)
@@ -92,10 +80,7 @@ class SettingsWidget(QWidget):
         panel_layout.setContentsMargins(30, 30, 30, 30)
         
         title = QLabel("CONTROL SETTINGS")
-        title.setStyleSheet("""
-            font-family: 'Segoe Ui'; font-size: 32px; font-weight: bold;
-            color: white; margin-bottom: 20px; background: transparent;
-        """)
+        title.setStyleSheet(TITLE_TEXT)
         title.setAlignment(Qt.AlignCenter)
         panel_layout.addWidget(title)
         
@@ -110,26 +95,19 @@ class SettingsWidget(QWidget):
             self.buttons[cmd] = btn
             
             lbl = QLabel(CMD_LABELS[cmd] + "   ")
-            lbl.setStyleSheet("""
-                font-family: 'Segoe Ui'; font-size: 17px; 
-                color: white; background: transparent;
-            """)
+            lbl.setStyleSheet(TEXT)
             form_layout.addRow(lbl, btn)
             
         panel_layout.addWidget(form_container)
         
+        panel_layout.addSpacing(30)
         self.save_btn = QPushButton("SAVE | RETURN")
         self.save_btn.setFixedHeight(50)
-        self.save_btn.setStyleSheet("""
-            QPushButton {
-                font-family: 'Segoe Ui'; background-color: #333; color: white;
-                border: 2px solid #444; border-radius: 5px;
-                font-size: 18px; font-weight: bold; margin-top: 20px;
-            }
-            QPushButton:hover { background-color: #444444; border: 2px solid #666; }
-        """)
+        self.save_btn.setStyleSheet(BTN_STYLE)
         panel_layout.addWidget(self.save_btn)
         outer_layout.addWidget(self.panel)
+
+        self.save_btn.clicked.connect(self.save_clicked.emit)
 
     def reset_all_grabbers(self):
         for btn in self.buttons.values():
@@ -155,7 +133,6 @@ class SettingsWidget(QWidget):
         return self.bindings
 
     def has_unsaved_changes(self):
-        """ Checks if any buttons current key differs from the saved binding. """
         self.reset_all_grabbers()
         for cmd, btn in self.buttons.items():
             if self.bindings[cmd] != btn.current_key:
@@ -163,7 +140,6 @@ class SettingsWidget(QWidget):
         return False
 
     def revert_changes(self):
-        """ Discards changes and resets buttons to their last saved state. """
         self.reset_all_grabbers()
         for cmd, btn in self.buttons.items():
             btn.current_key = self.bindings[cmd]

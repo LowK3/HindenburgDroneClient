@@ -1,12 +1,17 @@
+import os
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton, QScrollArea, QFrame
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
-import os
+from Video.styles import (
+    MAIN_PANEL_STYLE, TITLE_TEXT, TITLE_2_TEXT, TEXT, BTN_STYLE, 
+    SCROLL_AREA_STYLE, BTN_BG_COLOR
+)
 
 class TutorialWidget(QWidget):
-    """ The scrollable connection tutorial page. """
+    back_clicked = Signal()
+
     def __init__(self, parent=None):
         super().__init__(parent)
         
@@ -15,7 +20,7 @@ class TutorialWidget(QWidget):
 
         self.panel = QWidget()
         self.panel.setObjectName("TutorialPanel")
-        self.panel.setStyleSheet("#TutorialPanel { background-color: #1A1A1A; border-radius: 15px; border: 2px solid #333; }")
+        self.panel.setStyleSheet(MAIN_PANEL_STYLE)
         self.panel.setFixedSize(900, 750)
         
         panel_layout = QVBoxLayout(self.panel)
@@ -23,27 +28,7 @@ class TutorialWidget(QWidget):
 
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
-        scroll_area.setStyleSheet("""
-            QScrollArea { 
-                border: none; background: transparent; 
-            }
-            QScrollBar:vertical {
-                border: none; background: transparent; width: 10px; margin: 0px;
-            }
-            QScrollBar::handle:vertical {
-                background: #333; min-height: 25px; border: 1px solid #444; 
-                border-radius: 5px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background: #444444; border: 1px solid #666;
-            }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                border: none; background: none; height: 0px;
-            }
-            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-                background: none;
-            }
-        """)
+        scroll_area.setStyleSheet(SCROLL_AREA_STYLE)
 
         scroll_content = QWidget()
         scroll_content.setStyleSheet("background: transparent;")
@@ -51,7 +36,7 @@ class TutorialWidget(QWidget):
         scroll_layout.setSpacing(20)
 
         title = QLabel("CONNECTION TUTORIAL")
-        title.setStyleSheet("font-family: 'Segoe Ui'; font-size: 28px; font-weight: bold; color: white;")
+        title.setStyleSheet(TITLE_TEXT)
         title.setAlignment(Qt.AlignCenter)
         scroll_layout.addWidget(title)
 
@@ -71,12 +56,12 @@ class TutorialWidget(QWidget):
         
         for i, (step_title, step_text) in enumerate(steps):
             st_lbl = QLabel(step_title)
-            st_lbl.setStyleSheet("font-size: 18px; font-weight: bold; color: white;")
+            st_lbl.setStyleSheet(TITLE_2_TEXT)
             scroll_layout.addWidget(st_lbl)
 
             desc_lbl = QLabel(step_text)
             desc_lbl.setWordWrap(True)
-            desc_lbl.setStyleSheet("font-size: 15px; color: white;")
+            desc_lbl.setStyleSheet(TEXT)
             scroll_layout.addWidget(desc_lbl)
             
             if i < len(steps) - 1:
@@ -99,23 +84,18 @@ class TutorialWidget(QWidget):
             if i < len(steps) - 1:
                 line = QFrame()
                 line.setFrameShape(QFrame.HLine)
-                line.setStyleSheet("background-color: #333;")
+                line.setStyleSheet(f"background-color: {BTN_BG_COLOR}")
                 scroll_layout.addWidget(line)
 
         scroll_area.setWidget(scroll_content)
         panel_layout.addWidget(scroll_area)
 
-        panel_layout.addSpacing(30)
+        panel_layout.addSpacing(40)
         self.back_btn = QPushButton("BACK")
         self.back_btn.setFixedHeight(50)
-        self.back_btn.setStyleSheet("""
-            QPushButton {
-                font-family: 'Segoe Ui'; background-color: #333; color: white;
-                border: 2px solid #444; border-radius: 5px;
-                font-size: 18px; font-weight: bold; margin-top: 10px;
-            }
-            QPushButton:hover { background-color: #444444; border: 2px solid #666; }
-        """)
+        self.back_btn.setStyleSheet(BTN_STYLE)
         panel_layout.addWidget(self.back_btn)
         
         outer_layout.addWidget(self.panel)
+
+        self.back_btn.clicked.connect(self.back_clicked.emit)
