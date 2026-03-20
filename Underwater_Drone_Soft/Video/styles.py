@@ -22,11 +22,6 @@ def get_status_dot_style(connected):
     color = f"{ACCENT_GREEN}" if connected else f"{ACCENT_RED   }"
     return f"background-color: {color}; border-radius: 6px;"
 
-TEXT_STYLE = f"""
-    font-family: {FONT_FAMILY};
-    color: {TEXT_WHITE};
-"""
-
 WAITING_TITLE = f"""
     font-family: {FONT_FAMILY};
     font-size: 48px;
@@ -58,6 +53,11 @@ TEXT = f"""
 TEXT_BOLD = f"""
     {TEXT}
     font-weight: bold;
+"""
+
+ALERT_TEXT = f"""
+    {TEXT_BOLD}
+    color: {ACCENT_RED};
 """
 
 MAIN_PANEL_STYLE = f"""

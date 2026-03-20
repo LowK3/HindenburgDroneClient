@@ -8,6 +8,7 @@ from PySide6.QtGui import QImage, QPixmap, QAction
 from Video.overlay_manager import OverlayManager
 from Control.input_manager import InputManager
 from Video.connection_hud import ConnectionHud
+from Video.telemetry_widget import TelemetryWidget
 from Utils.display_func import create_qpixmap
 from Utils.logger import log
 from config import WINDOW_NAME, UDP_TIMEOUT
@@ -39,6 +40,9 @@ class VideoWindow(QMainWindow):
         # 2. Setup the User Interface
         self._setup_ui()
         self._create_actions()
+
+        # Direct the network's telemetry listener to the new Telemetry HUD
+        self.input.control.telemetry_callback = self.telemetry_panel.update_telemetry
 
         # 3. Final Window Config
         self.showMaximized()
@@ -75,12 +79,23 @@ class VideoWindow(QMainWindow):
         # Menu overlay setup
         self.overlay = OverlayManager(self)
 
+        self.top_left_container = QWidget()
+        #self.top_left_container.setStyleSheet("background: transparent;")
+        tl_layout = QVBoxLayout(self.top_left_container)
+        tl_layout.setContentsMargins(0, 0, 0, 0)
+        tl_layout.setSpacing(20)
+
         # Floating Info Button
         self.info_button = QPushButton("INFO")
         self.info_button.setFixedSize(90, 50)
         self.info_button.setStyleSheet(INFO_BTN_STYLE)
-        self.video_layout.addWidget(self.info_button, 0, 0, alignment=Qt.AlignTop | Qt.AlignLeft)
+        tl_layout.addWidget(self.info_button, alignment=Qt.AlignTop | Qt.AlignLeft)
         self.info_button.clicked.connect(self.overlay.show_info_page)
+
+        # Telemetry Hud
+        self.telemetry_panel = TelemetryWidget()
+        tl_layout.addWidget(self.telemetry_panel, alignment=Qt.AlignTop | Qt.AlignLeft)
+        self.video_layout.addWidget(self.top_left_container, 0, 0, alignment=Qt.AlignTop | Qt.AlignLeft)
 
         # Connection Status Hud
         self.conn_panel = ConnectionHud()

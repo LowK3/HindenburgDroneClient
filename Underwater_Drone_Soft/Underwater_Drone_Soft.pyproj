@@ -44,6 +44,7 @@
     <Compile Include="Video\overlay_manager.py" />
     <Compile Include="Video\settings_widget.py" />
     <Compile Include="Video\styles.py" />
+    <Compile Include="Video\telemetry_widget.py" />
     <Compile Include="Video\tutorial_widget.py" />
     <Compile Include="Video\__init__.py" />
   </ItemGroup>
