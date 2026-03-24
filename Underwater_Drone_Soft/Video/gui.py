@@ -23,7 +23,6 @@ class VideoWindow(QMainWindow):
     def __init__(self, frame_buffer, control_client):
         super().__init__()
         self.fb = frame_buffer
-        self.is_true_fullscreen = False
         self.setWindowTitle(WINDOW_NAME)
 
         # 1. Setup Data & Timers
@@ -95,7 +94,7 @@ class VideoWindow(QMainWindow):
         self.info_button.setFixedSize(90, 50)
         self.info_button.setStyleSheet(INFO_BTN_STYLE)
         tl_layout.addWidget(self.info_button, alignment=Qt.AlignTop | Qt.AlignLeft)
-        self.info_button.clicked.connect(self.overlay.show_info_page)
+        self.info_button.clicked.connect(self.open_info_page_safely)
 
         self.left_telemetry_panel = LeftTelemetryWidget()
         tl_layout.addWidget(self.left_telemetry_panel, alignment=Qt.AlignTop | Qt.AlignLeft)
@@ -122,10 +121,14 @@ class VideoWindow(QMainWindow):
 
     # --- INPUT EVENTS ---
     def keyPressEvent(self, event):
+        if self.overlay.isVisible():
+            super().keyPressEvent(event)
+            return
         self.input.key_pressed(event)
 
     def keyReleaseEvent(self, event):
         self.input.key_released(event)
+        super().keyReleaseEvent(event)
 
     # --- WINDOW MANAGEMENT ---
     def resizeEvent(self, event):
@@ -197,20 +200,22 @@ class VideoWindow(QMainWindow):
 
         self.action_toggle_menu = QAction("Toggle Menu", self)
         self.action_toggle_menu.setShortcut("Esc")
-        self.action_toggle_menu.triggered.connect(self.overlay.toggle_menu)
+        self.action_toggle_menu.triggered.connect(self.toggle_menu_safely)
         self.addAction(self.action_toggle_menu)
 
-    def show_windowed_fullscreen(self):
-        self.is_true_fullscreen = False
-        self.showMaximized()
-
-    def show_true_fullscreen(self):
-        self.is_true_fullscreen = True
-        self.showFullScreen()
-
     def toggle_fullscreen(self):
-        if self.is_true_fullscreen:
-            self.show_windowed_fullscreen()
+        if self.isFullScreen():
+            self.showMaximized()
         else:
-            self.show_true_fullscreen()
+            self.showFullScreen()
+
+    # --- OPEN MENUS SAFELY ---
+    def open_info_page_safely(self):
+        self.input.current_command = "STOP"
+        self.overlay.show_info_page()
+
+    def toggle_menu_safely(self):
+        if not self.overlay.isVisible():
+            self.input.current_command = "STOP"
+        self.overlay.toggle_menu()
 

@@ -59,7 +59,7 @@ TEXT_BOLD = f"""
 
 ALERT_TEXT = f"""
     {TEXT_BOLD}
-    color: {ACCENT_RED};
+    color: {WARNING_YELLOW};
 """
 
 WARNING_TEXT = f"""
@@ -69,10 +69,9 @@ WARNING_TEXT = f"""
     color: black;
     background-color: {WARNING_YELLOW};
     border-radius: 8px; 
-    padding: 10px 20px;
+    padding: 8px 16px;
     border: 2px solid {BORDER_COLOR};
 """
-
 
 MAIN_PANEL_STYLE = f"""
     #MainPanel, #SettingsPanel, #InfoPanel, #TutorialPanel, #ConfirmPanel {{
