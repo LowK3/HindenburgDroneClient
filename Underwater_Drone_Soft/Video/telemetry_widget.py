@@ -70,16 +70,36 @@ class RightTelemetryWidget(QWidget):
         self.tel_rear_pwr = QLabel("REAR PWR: -- %")
         self.tel_rear_pwr.setStyleSheet(TEXT_BOLD)
 
+        self.tel_hull_temp = QLabel("HULL TEMP: -- °C")
+        self.tel_hull_temp.setStyleSheet(TEXT_BOLD)
+
+        self.tel_hull_hum = QLabel("HULL HUM: -- %")
+        self.tel_hull_hum.setStyleSheet(TEXT_BOLD)
+
         layout.addWidget(self.title)
         layout.addWidget(self.tel_front_pwr)
         layout.addWidget(self.tel_rear_pwr)
+        layout.addWidget(self.tel_hull_temp)
+        layout.addWidget(self.tel_hull_hum)
 
     def update_ui(self, data):
-        rear_pct = data.get('rear_power', 0)
         front_pct = data.get('front_power', 0)
+        rear_pct = data.get('rear_power', 0)
         
-        self.tel_rear_pwr.setText(f"FWD PWR: {rear_pct} %")
-        self.tel_front_pwr.setText(f"TILT PWR: {front_pct} %")
+        self.tel_front_pwr.setText(f"FRONT PWR: {front_pct} %")
+        self.tel_rear_pwr.setText(f"REAR PWR: {rear_pct} %")
+
+        hull_temp = data.get('hull_temp', 0.0)
+        hull_hum = data.get('hull_hum', 0.0)
+        
+        self.tel_hull_temp.setText(f"HULL TEMP: {hull_temp} °C")
+        self.tel_hull_hum.setText(f"HULL HUM: {hull_hum} %")
+
+        if hull_hum > 65.0:
+            self.tel_hull_hum.setText(f"⚠️ HULL HUM: {hull_hum} %")
+            self.tel_hull_hum.setStyleSheet(ALERT_TEXT)
+        else:
+            self.tel_hull_hum.setStyleSheet(TEXT_BOLD)
         pass
 
 class WarningWidget(QWidget):
