@@ -3,12 +3,12 @@ from PySide6.QtWidgets import (
     QMainWindow, QLabel, QPushButton, QVBoxLayout, 
     QWidget, QGridLayout, QHBoxLayout
 )
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtGui import QImage, QPixmap, QAction
 from Video.overlay_manager import OverlayManager
 from Control.input_manager import InputManager
 from Video.connection_hud import ConnectionHud
-from Video.telemetry_widget import TelemetryWidget
+from Video.telemetry_widget import LeftTelemetryWidget, RightTelemetryWidget, WarningWidget
 from Utils.display_func import create_qpixmap
 from Utils.logger import log
 from config import WINDOW_NAME, UDP_TIMEOUT
@@ -18,6 +18,8 @@ from Video.styles import (
 )
 
 class VideoWindow(QMainWindow):
+    telemetry_signal = Signal(dict)
+
     def __init__(self, frame_buffer, control_client):
         super().__init__()
         self.fb = frame_buffer
@@ -41,9 +43,6 @@ class VideoWindow(QMainWindow):
         self._setup_ui()
         self._create_actions()
 
-        # Direct the network's telemetry listener to the new Telemetry HUD
-        self.input.control.telemetry_callback = self.telemetry_panel.update_telemetry
-
         # 3. Final Window Config
         self.showMaximized()
         self.setFocusPolicy(Qt.StrongFocus)
@@ -51,6 +50,14 @@ class VideoWindow(QMainWindow):
 
         if self.input.settings.value("show_info_on_startup", True, type=bool):
             self.overlay.show_info_page()
+
+        # Update telemetry
+        self.input.control.telemetry_callback = self.telemetry_signal.emit
+
+        self.telemetry_signal.connect(self.left_telemetry_panel.update_ui)
+        self.telemetry_signal.connect(self.right_telemetry_panel.update_ui)
+        self.telemetry_signal.connect(self.warning_panel.update_ui)
+
 
     def _setup_ui(self):
         """ Builds the main video layouts and overlay stack. """
@@ -76,30 +83,42 @@ class VideoWindow(QMainWindow):
         self.waiting_label.setStyleSheet(WAITING_TITLE)
         self.video_layout.addWidget(self.waiting_label, 0, 0, alignment=Qt.AlignCenter)
 
-        # Menu overlay setup
         self.overlay = OverlayManager(self)
 
+        # --- Top-left container for info button and telemetry ---
         self.top_left_container = QWidget()
-        #self.top_left_container.setStyleSheet("background: transparent;")
         tl_layout = QVBoxLayout(self.top_left_container)
         tl_layout.setContentsMargins(0, 0, 0, 0)
         tl_layout.setSpacing(20)
 
-        # Floating Info Button
         self.info_button = QPushButton("INFO")
         self.info_button.setFixedSize(90, 50)
         self.info_button.setStyleSheet(INFO_BTN_STYLE)
         tl_layout.addWidget(self.info_button, alignment=Qt.AlignTop | Qt.AlignLeft)
         self.info_button.clicked.connect(self.overlay.show_info_page)
 
-        # Telemetry Hud
-        self.telemetry_panel = TelemetryWidget()
-        tl_layout.addWidget(self.telemetry_panel, alignment=Qt.AlignTop | Qt.AlignLeft)
+        self.left_telemetry_panel = LeftTelemetryWidget()
+        tl_layout.addWidget(self.left_telemetry_panel, alignment=Qt.AlignTop | Qt.AlignLeft)
         self.video_layout.addWidget(self.top_left_container, 0, 0, alignment=Qt.AlignTop | Qt.AlignLeft)
 
-        # Connection Status Hud
+        # --- Top-right container for connection status and telemetry ---
+        self.top_right_container = QWidget()
+        tr_layout = QVBoxLayout(self.top_right_container)
+        tr_layout.setContentsMargins(0, 0, 0, 0)
+        tr_layout.setSpacing(20)
+
         self.conn_panel = ConnectionHud()
-        self.video_layout.addWidget(self.conn_panel, 0, 0, alignment=Qt.AlignTop | Qt.AlignRight)
+        tr_layout.addWidget(self.conn_panel, alignment=Qt.AlignTop | Qt.AlignRight)
+
+        self.right_telemetry_panel = RightTelemetryWidget()
+        tr_layout.addWidget(self.right_telemetry_panel, alignment=Qt.AlignTop | Qt.AlignRight)
+        
+        self.video_layout.addWidget(self.top_right_container, 0, 0, alignment=Qt.AlignTop | Qt.AlignRight)
+
+        # --- Warning overlay ---
+        self.warning_panel = WarningWidget()
+        self.video_layout.addWidget(self.warning_panel, 0, 0, alignment=Qt.AlignTop | Qt.AlignHCenter)
+
 
     # --- INPUT EVENTS ---
     def keyPressEvent(self, event):

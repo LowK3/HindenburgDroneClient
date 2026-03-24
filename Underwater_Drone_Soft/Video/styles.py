@@ -10,6 +10,8 @@ UNBOUND_HOVER_COLOR = "#FF3336"
 BORDER_UNBOUND_COLOR = "#FF3336"
 BORDER_UNBOUND_HOVER_COLOR= "#FF6669"
 
+WARNING_YELLOW = "#F0AE00"
+
 PRESS_KEY_COLOR = "#DBDBDB"
 
 ACCENT_GREEN = "#33FF33"
@@ -59,6 +61,18 @@ ALERT_TEXT = f"""
     {TEXT_BOLD}
     color: {ACCENT_RED};
 """
+
+WARNING_TEXT = f"""
+    font-family: {FONT_FAMILY};
+    font-size: 26px;
+    font-weight: bold;
+    color: black;
+    background-color: {WARNING_YELLOW};
+    border-radius: 8px; 
+    padding: 10px 20px;
+    border: 2px solid {BORDER_COLOR};
+"""
+
 
 MAIN_PANEL_STYLE = f"""
     #MainPanel, #SettingsPanel, #InfoPanel, #TutorialPanel, #ConfirmPanel {{
