@@ -1,5 +1,4 @@
-import sys
-import threading
+import sys, threading
 from PySide6.QtWidgets import QApplication
 from Video.gui import VideoWindow
 from Utils.frame_buffer import FrameBuffer
