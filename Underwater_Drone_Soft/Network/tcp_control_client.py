@@ -32,29 +32,33 @@ class ControlClient:
         try:
             data_str = json.dumps(payload) + "\n"
             self.sock.sendall(data_str.encode())
+        except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError):
+            log("Control TCP disconnected by server.")
+            self.sock = None
         except Exception as e:
             log(f"Control send error: {e}\n{traceback.format_exc()}")
             self.sock = None
 
     def receive(self):
         """ Background thread that catches telemetry from the server """
-        buffer = ""
+        buffer = b""
         while not self._stop_event.is_set() and self.sock:
             try:
                 self.sock.settimeout(TIMEOUT)
                 data = self.sock.recv(1024)
                 if not data:
                     break
-                buffer += data.decode()
+                buffer += data
                 
-                while "\n" in buffer:
-                    msg, buffer = buffer.split("\n", 1)
-                    if msg and self.telemetry_callback:
+                while b"\n" in buffer:
+                    msg_bytes, buffer = buffer.split(b"\n", 1)
+                    if msg_bytes and self.telemetry_callback:
                         try:
-                            payload = json.loads(msg)
+                            msg_str = msg_bytes.decode('utf-8').strip()
+                            payload = json.loads(msg_str)
                             if payload.get("type") == "TELEMETRY":
                                 self.telemetry_callback(payload)
-                        except json.JSONDecodeError:
+                        except (UnicodeDecodeError, json.JSONDecodeError):
                             pass
             except socket.timeout:
                 continue

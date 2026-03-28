@@ -62,9 +62,10 @@ class SettingsWidget(QWidget):
     """ The in-overlay settings page for changing keybinds. """
     save_clicked = Signal()
 
-    def __init__(self, current_bindings, parent=None):
+    def __init__(self, current_bindings, default_bindings, parent=None):
         super().__init__(parent)
         self.bindings = current_bindings.copy()
+        self.default_bindings = default_bindings
         self.buttons = {}
         
         outer_layout = QVBoxLayout(self)
@@ -99,15 +100,21 @@ class SettingsWidget(QWidget):
             form_layout.addRow(lbl, btn)
             
         panel_layout.addWidget(form_container)
-        
-        panel_layout.addSpacing(30)
+        panel_layout.setSpacing(20)
+
+        self.rst_binds_btn = QPushButton("RESET TO DEFAULTS")
+        self.rst_binds_btn.setFixedHeight(40)
+        self.rst_binds_btn.setStyleSheet(BTN_STYLE)
+        panel_layout.addWidget(self.rst_binds_btn)
+        self.rst_binds_btn.clicked.connect(self.revert_to_default)
+
         self.save_btn = QPushButton("SAVE | RETURN")
-        self.save_btn.setFixedHeight(50)
+        self.save_btn.setFixedHeight(40)
         self.save_btn.setStyleSheet(BTN_STYLE)
         panel_layout.addWidget(self.save_btn)
-        outer_layout.addWidget(self.panel)
-
         self.save_btn.clicked.connect(self.save_clicked.emit)
+
+        outer_layout.addWidget(self.panel)
 
     def reset_all_grabbers(self):
         for btn in self.buttons.values():
@@ -131,6 +138,12 @@ class SettingsWidget(QWidget):
         for cmd, btn in self.buttons.items():
             self.bindings[cmd] = btn.current_key
         return self.bindings
+
+    def revert_to_default(self):
+        self.reset_all_grabbers()
+        for cmd, btn in self.buttons.items():
+            btn.current_key = self.default_bindings.get(cmd, 0)
+            btn.update_display()
 
     def has_unsaved_changes(self):
         self.reset_all_grabbers()

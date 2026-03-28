@@ -34,7 +34,7 @@ class OverlayManager(QWidget):
         self.main_menu_widget.quit_clicked.connect(self.main.close)
 
         # Page 1: SETTINGS MENU
-        self.settings_page = SettingsWidget(self.main.input.bindings, self.main)
+        self.settings_page = SettingsWidget(self.main.input.bindings, self.main.input.default_bindings)
         self.settings_page.save_clicked.connect(self.save_and_return)
 
         # Page 2: INFO MENU

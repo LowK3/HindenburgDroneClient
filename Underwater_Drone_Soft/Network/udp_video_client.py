@@ -56,7 +56,7 @@ class VideoClient:
                     raise TimeoutError("No video data from server.")
                 return None
             except Exception as e:
-                raise ConnectionResetError(f"UDP receive error: {e}\n{traceback.format_exc()}")
+                raise ConnectionResetError(f"UDP receive error: {e}\n")
 
     def stop(self):
         if self.sock:

@@ -44,8 +44,14 @@ class NetworkWorker:
                         with self.fb.lock:
                             self.fb.frame = frame
                             self.fb.new_frame = True
+                except TimeoutError:
+                    log("Video stream timed out. Breaking connection...")
+                    break
+                except ConnectionResetError as e:
+                    log(f"Video connection reset: {e}")
+                    break
                 except Exception as e:
-                    log(f"Network error: {e}\n{traceback.format_exc()}")
+                    log(f"Network error: {e}\n")
                     break
 
             # Cleanup and back to discovery
