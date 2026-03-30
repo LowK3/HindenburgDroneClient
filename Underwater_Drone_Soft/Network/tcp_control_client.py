@@ -55,7 +55,7 @@ class ControlClient(QObject):
                 
                 while b"\n" in buffer:
                     msg_bytes, buffer = buffer.split(b"\n", 1)
-                    if msg_bytes and self.telemetry_callback:
+                    if msg_bytes:
                         try:
                             msg_str = msg_bytes.decode('utf-8').strip()
                             payload = json.loads(msg_str)
@@ -65,6 +65,9 @@ class ControlClient(QObject):
                             pass
             except socket.timeout:
                 continue
+            except (OSError, ConnectionAbortedError, ConnectionResetError):
+                # Socket closed intentionally by stop() or disconnected by server
+                break
             except Exception as e:
                 log(f"Fatal error in receive thread: {e}\n{traceback.format_exc()}")
                 break

@@ -49,9 +49,9 @@ class VideoWindow(QMainWindow):
             self.overlay.show_info_page()
 
         # Update telemetry
-        self.input.telemetry_received.connect(self.left_telemetry_panel.update_ui)
-        self.input.telemetry_received.connect(self.right_telemetry_panel.update_ui)
-        self.input.telemetry_received.connect(self.warning_panel.update_ui)
+        self.input.control.telemetry_received.connect(self.left_telemetry_panel.update_ui)
+        self.input.control.telemetry_received.connect(self.right_telemetry_panel.update_ui)
+        self.input.control.telemetry_received.connect(self.warning_panel.update_ui)
 
 
     def _setup_ui(self):
