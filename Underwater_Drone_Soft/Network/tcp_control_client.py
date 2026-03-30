@@ -1,12 +1,15 @@
 import socket, traceback, json, threading
+from PySide6.QtCore import QObject, Signal
 from config import CONTROL_TCP_PORT, CONTROL_TIMEOUT, TIMEOUT
 from Utils.logger import log
 
-class ControlClient:
+class ControlClient(QObject):
     """ Client-side engine control link. """
+    telemetry_received = Signal(dict)
+
     def __init__(self):
+        super().__init__()
         self.sock = None
-        self.telemetry_callback = None
         self._stop_event = threading.Event()
 
     def connect(self, ip):
@@ -57,12 +60,13 @@ class ControlClient:
                             msg_str = msg_bytes.decode('utf-8').strip()
                             payload = json.loads(msg_str)
                             if payload.get("type") == "TELEMETRY":
-                                self.telemetry_callback(payload)
+                                self.telemetry_received.emit(payload)
                         except (UnicodeDecodeError, json.JSONDecodeError):
                             pass
             except socket.timeout:
                 continue
-            except Exception:
+            except Exception as e:
+                log(f"Fatal error in receive thread: {e}\n{traceback.format_exc()}")
                 break
 
     def stop(self):

@@ -18,8 +18,6 @@ from Video.styles import (
 )
 
 class VideoWindow(QMainWindow):
-    telemetry_signal = Signal(dict)
-
     def __init__(self, frame_buffer, control_client):
         super().__init__()
         self.fb = frame_buffer
@@ -51,11 +49,9 @@ class VideoWindow(QMainWindow):
             self.overlay.show_info_page()
 
         # Update telemetry
-        self.input.control.telemetry_callback = self.telemetry_signal.emit
-
-        self.telemetry_signal.connect(self.left_telemetry_panel.update_ui)
-        self.telemetry_signal.connect(self.right_telemetry_panel.update_ui)
-        self.telemetry_signal.connect(self.warning_panel.update_ui)
+        self.input.telemetry_received.connect(self.left_telemetry_panel.update_ui)
+        self.input.telemetry_received.connect(self.right_telemetry_panel.update_ui)
+        self.input.telemetry_received.connect(self.warning_panel.update_ui)
 
 
     def _setup_ui(self):
