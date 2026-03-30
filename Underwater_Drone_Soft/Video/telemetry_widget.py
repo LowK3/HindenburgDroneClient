@@ -143,7 +143,7 @@ class WarningWidget(QWidget):
         else:
             self.leak_label.hide()
 
-        if data.get("camera_status", True):
+        if not data.get("camera_status", True):
             self.camera_warning_label.setText("WARNING! CAMERA FAILED TO START. DRONE IS STILL DRIVABLE.")
             self.camera_warning_label.show()
         else:

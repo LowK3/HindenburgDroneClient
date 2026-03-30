@@ -44,7 +44,7 @@ class InputManager(QObject):
         if self.control and self.control.sock:
             self.update_status_ui(True)
             try:
-                self.control.send({"cmd": self.current_command})
+                self.control.send({"cmd": "PING"})  
             except Exception:
                 self.update_status_ui(False)
         else:
@@ -57,14 +57,14 @@ class InputManager(QObject):
         if not cmd: 
             return
 
-        if cmd in {"W", "S", "A", "D", "UP", "DOWN"}:
-            self.current_command = cmd
-        else:
-            self.control.send({"cmd": cmd})
+        self.current_command = cmd
+        self.control.send({"cmd": cmd})
 
     def key_released(self, event):
         if event.isAutoRepeat(): 
             return
         cmd = self.key_to_cmd.get(event.key())
         if cmd in {"W", "S", "A", "D", "UP", "DOWN"}:
-            self.current_command = "STOP"
+            if self.current_command == cmd:
+                self.current_command = "STOP"
+                self.control.send({"cmd": "STOP"})

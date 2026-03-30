@@ -14,6 +14,7 @@ logger.setLevel(logging.INFO)
 file_handler = RotatingFileHandler(
     LOG_FILE, 
     maxBytes = 5 * 1024 * 1024, 
+    encoding="utf-8",
     backupCount = 2
 )
 
