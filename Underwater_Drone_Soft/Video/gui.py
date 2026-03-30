@@ -59,7 +59,7 @@ class VideoWindow(QMainWindow):
         central = QWidget()
         self.setCentralWidget(central)
 
-        # Video container
+        # --- Video container ---
         self.video_container = QWidget()
         self.video_layout = QGridLayout(self.video_container)
         self.video_layout.setContentsMargins(0, 0, 0, 0)
@@ -94,6 +94,7 @@ class VideoWindow(QMainWindow):
 
         self.left_telemetry_panel = LeftTelemetryWidget()
         tl_layout.addWidget(self.left_telemetry_panel, alignment=Qt.AlignTop | Qt.AlignLeft)
+
         self.video_layout.addWidget(self.top_left_container, 0, 0, alignment=Qt.AlignTop | Qt.AlignLeft)
 
         # --- Top-right container for connection status and telemetry ---
@@ -112,7 +113,7 @@ class VideoWindow(QMainWindow):
 
         # --- Warning overlay ---
         self.warning_panel = WarningWidget()
-        self.video_layout.addWidget(self.warning_panel, 0, 0, alignment=Qt.AlignTop | Qt.AlignHCenter)
+        self.video_layout.addWidget(self.warning_panel, 0, 0)
 
 
     # --- INPUT EVENTS ---
@@ -137,6 +138,9 @@ class VideoWindow(QMainWindow):
 
     def update_control_status(self, connected):
         self.conn_panel.update_control_status(connected)
+
+        if not connected:
+            self.warning_panel.reset_ui()
 
     # --- VIDEO RENDERING ---
     def update_frame(self):

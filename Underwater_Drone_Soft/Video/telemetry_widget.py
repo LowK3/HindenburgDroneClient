@@ -14,23 +14,22 @@ class LeftTelemetryWidget(QWidget):
         self.title = QLabel("RASPBERRY PI DATA")
         self.title.setStyleSheet(TITLE_2_TEXT)
         self.title.setContentsMargins(0, 0, 0, 15)
+        layout.addWidget(self.title)
 
         self.tel_temp = QLabel("CPU TEMP: -- °C")
         self.tel_temp.setStyleSheet(TEXT_BOLD)
+        layout.addWidget(self.tel_temp)
         
         self.tel_cpu = QLabel("CPU: -- %")
         self.tel_cpu.setStyleSheet(TEXT_BOLD)
+        layout.addWidget(self.tel_cpu)
 
         self.tel_ram = QLabel("RAM: -- %")
         self.tel_ram.setStyleSheet(TEXT_BOLD)
+        layout.addWidget(self.tel_ram)
 
         self.tel_power = QLabel("")
         self.tel_power.setStyleSheet(TEXT_BOLD)
-
-        layout.addWidget(self.title)
-        layout.addWidget(self.tel_temp)
-        layout.addWidget(self.tel_cpu)
-        layout.addWidget(self.tel_ram)
         layout.addWidget(self.tel_power)
 
     def update_ui(self, data):
@@ -63,45 +62,43 @@ class RightTelemetryWidget(QWidget):
         self.title = QLabel("DRONE DATA")
         self.title.setStyleSheet(TITLE_2_TEXT)
         self.title.setContentsMargins(0, 0, 0, 15)
+        layout.addWidget(self.title)
 
         self.tel_front_pwr = QLabel("FRONT PWR: -- %")
         self.tel_front_pwr.setStyleSheet(TEXT_BOLD)
+        layout.addWidget(self.tel_front_pwr)
 
         self.tel_rear_pwr = QLabel("REAR PWR: -- %")
         self.tel_rear_pwr.setStyleSheet(TEXT_BOLD)
         self.tel_rear_pwr.setContentsMargins(0, 0, 0, 15)
+        layout.addWidget(self.tel_rear_pwr)
+
 
         self.tel_hull_temp = QLabel("HULL TEMP: -- °C")
         self.tel_hull_temp.setStyleSheet(TEXT_BOLD)
+        layout.addWidget(self.tel_hull_temp)
 
         self.tel_hull_hum = QLabel("HULL HUM: -- %")
         self.tel_hull_hum.setStyleSheet(TEXT_BOLD)
         self.tel_hull_hum.setContentsMargins(0, 0, 0, 15)
+        layout.addWidget(self.tel_hull_hum)
 
         self.tel_pitch = QLabel("PITCH: -- °")
         self.tel_pitch.setStyleSheet(TEXT_BOLD)
+        layout.addWidget(self.tel_pitch)
         
         self.tel_roll = QLabel("ROLL: -- °")
         self.tel_roll.setStyleSheet(TEXT_BOLD)
-
-        layout.addWidget(self.title)
-        layout.addWidget(self.tel_front_pwr)
-        layout.addWidget(self.tel_rear_pwr)
-        layout.addWidget(self.tel_hull_temp)
-        layout.addWidget(self.tel_hull_hum)
-        layout.addWidget(self.tel_pitch)
         layout.addWidget(self.tel_roll)
 
     def update_ui(self, data):
-        front_pct = data.get('front_power', 0)
-        rear_pct = data.get('rear_power', 0)
-
+        front_pct = data.get("front_power", 0)
+        rear_pct = data.get("rear_power", 0)
         self.tel_front_pwr.setText(f"FRONT PWR: {front_pct} %")
         self.tel_rear_pwr.setText(f"REAR PWR: {rear_pct} %")
 
-        hull_temp = data.get('hull_temp', 0.0)
-        hull_hum = data.get('hull_hum', 0.0)
-        
+        hull_temp = data.get("hull_temp", 0.0)
+        hull_hum = data.get("hull_hum", 0.0)
         self.tel_hull_temp.setText(f"HULL TEMP: {hull_temp} °C")
         self.tel_hull_hum.setText(f"HULL HUM: {hull_hum} %")
 
@@ -112,9 +109,8 @@ class RightTelemetryWidget(QWidget):
             self.tel_hull_hum.setStyleSheet(TEXT_BOLD)
         pass
 
-        pitch = data.get('pitch', 0.0)
-        roll = data.get('roll', 0.0)
-
+        pitch = data.get("pitch", 0.0)
+        roll = data.get("roll", 0.0)
         self.tel_pitch.setText(f"PITCH: {pitch} °")
         self.tel_roll.setText(f"ROLL: {roll} °")
 
@@ -124,17 +120,35 @@ class WarningWidget(QWidget):
         self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 20, 0, 0)
+        layout.setContentsMargins(0, 20, 0, 20)
 
         self.leak_label = QLabel("")
         self.leak_label.setStyleSheet(WARNING_TEXT)
         self.leak_label.hide()
-
         layout.addWidget(self.leak_label, alignment=Qt.AlignTop | Qt.AlignHCenter)
 
+        layout.addStretch()
+
+        self.camera_warning_label = QLabel("")
+        self.camera_warning_label.setStyleSheet(WARNING_TEXT)
+        self.camera_warning_label.hide()
+        layout.addWidget(self.camera_warning_label, alignment=Qt.AlignCenter)
+
+        layout.addStretch()
+
     def update_ui(self, data):
-        if data.get('leak_detected', False):
+        if data.get("leak_detected", False):
             self.leak_label.setText("WARNING! WATER DETECTED INSIDE THE HULL")
             self.leak_label.show()
         else:
             self.leak_label.hide()
+
+        if data.get("camera_status", True):
+            self.camera_warning_label.setText("WARNING! CAMERA FAILED TO START. DRONE IS STILL DRIVABLE.")
+            self.camera_warning_label.show()
+        else:
+            self.camera_warning_label.hide()
+
+    def reset_ui(self):
+        self.leak_label.hide()
+        self.camera_warning_label.hide()
