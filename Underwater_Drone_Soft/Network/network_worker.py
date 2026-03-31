@@ -37,7 +37,7 @@ class NetworkWorker:
             log(f"Fully connected to Drone at {ip}.")
 
             # Streaming loop
-            while not self.stop_event.is_set():
+            while not self.stop_event.is_set() and self.control.is_connected():
                 try:
                     frame = self.video.receive_frame()
                     if frame is not None:

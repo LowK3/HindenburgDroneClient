@@ -29,8 +29,11 @@ class ControlClient(QObject):
             self.sock = None
             return False
 
+    def is_connected(self) -> bool:
+        return self.sock is not None
+
     def send(self, payload: dict):
-        if not self.sock:
+        if not self.is_connected():
             return
         try:
             data_str = json.dumps(payload) + "\n"
@@ -44,17 +47,18 @@ class ControlClient(QObject):
 
     def receive(self):
         """ Background thread that catches telemetry from the server """
-        buffer = b""
-        while not self._stop_event.is_set() and self.sock:
+        buffer = bytearray()
+        while not self._stop_event.is_set() and self.is_connected:
             try:
                 self.sock.settimeout(TIMEOUT)
                 data = self.sock.recv(1024)
                 if not data:
                     break
-                buffer += data
+                buffer.extend(data)
                 
-                while b"\n" in buffer:
-                    msg_bytes, buffer = buffer.split(b"\n", 1)
+                while (newline_idx := buffer.find(b"\n")) != -1:
+                    msg_bytes = buffer[:newline_idx]
+                    del buffer[:newline_idx + 1]
                     if msg_bytes:
                         try:
                             msg_str = msg_bytes.decode('utf-8').strip()
@@ -74,7 +78,7 @@ class ControlClient(QObject):
 
     def stop(self):
         self._stop_event.set()
-        if self.sock:
+        if self.is_connected:
             self.sock.close()
             log("Control TCP socket closed.")
         self.sock = None
