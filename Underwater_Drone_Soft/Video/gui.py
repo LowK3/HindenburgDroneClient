@@ -11,7 +11,7 @@ from Video.connection_hud import ConnectionHud
 from Video.telemetry_widget import LeftTelemetryWidget, RightTelemetryWidget, WarningWidget
 from Utils.display_func import create_qpixmap
 from Utils.logger import log
-from config import WINDOW_NAME, UDP_TIMEOUT
+from config import WINDOW_NAME, UDP_TIMEOUT, HEARTBEAT_TIMER
 from Video.styles import (
     MAIN_PANEL_STYLE, CONNECTION_PANEL_STYLE, INFO_BTN_STYLE, ACCENT_GREEN, ACCENT_RED, 
     WAITING_TITLE, get_status_dot_style
@@ -21,10 +21,12 @@ class VideoWindow(QMainWindow):
     def __init__(self, frame_buffer, control_client):
         super().__init__()
         self.fb = frame_buffer
+        self.control = control_client
         self.setWindowTitle(WINDOW_NAME)
 
         # 1. Setup Data & Timers
-        self.input = InputManager(control_client, self.update_control_status)
+        self.input = InputManager(HEARTBEAT_TIMER)
+        self.input.command_requested.connect(self.control.send)
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
@@ -49,9 +51,9 @@ class VideoWindow(QMainWindow):
             self.overlay.show_info_page()
 
         # Update telemetry
-        self.input.control.telemetry_received.connect(self.left_telemetry_panel.update_ui)
-        self.input.control.telemetry_received.connect(self.right_telemetry_panel.update_ui)
-        self.input.control.telemetry_received.connect(self.warning_panel.update_ui)
+        self.control.telemetry_received.connect(self.left_telemetry_panel.update_ui)
+        self.control.telemetry_received.connect(self.right_telemetry_panel.update_ui)
+        self.control.telemetry_received.connect(self.warning_panel.update_ui)
 
 
     def _setup_ui(self):
@@ -144,6 +146,8 @@ class VideoWindow(QMainWindow):
 
     # --- VIDEO RENDERING ---
     def update_frame(self):
+        self.update_control_status(self.control.is_connected())
+
         if self.overlay.isVisible():
             return 
 

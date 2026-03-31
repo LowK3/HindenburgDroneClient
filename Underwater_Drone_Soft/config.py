@@ -13,7 +13,7 @@ TIMEOUT = 0.5
 DATA_WAIT = 0.5
 CON_INTERVAL = 0.5
 
-HEARTBEAT_SEND = 200 # 0.2 seconds
+HEARTBEAT_TIMER = 200 # 0.2 seconds
 
 """ Logging """
 LOG_PREFIX = "[CLIENT]"

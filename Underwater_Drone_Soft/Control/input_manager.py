@@ -1,17 +1,15 @@
-from PySide6.QtCore import QObject, QTimer, Qt, QSettings
-from Utils.logger import log
-from config import HEARTBEAT_SEND
+from PySide6.QtCore import QObject, QTimer, Qt, QSettings, Signal
 
 class InputManager(QObject):
     """ Handles keybinds, saving settings, and sending network commands. """
-    def __init__(self, control_client, status_callback):
+    command_requested = Signal(dict)
+
+    def __init__(self, heartbeat_interval: int):
         super().__init__()
-        self.control = control_client
-        self.update_status_ui = status_callback # Callback to change the HUD dot green/red
         self.current_command = "STOP"
         
         # Initializes QSettings and loads saved keybinds.
-        self.settings = QSettings("UnderwaterDrone", "DroneClient")
+        self.settings = QSettings("HindenburgDrone", "DroneClient")
         self.default_bindings = {
             "W": Qt.Key_W, "S": Qt.Key_S, "A": Qt.Key_A, "D": Qt.Key_D,
             "UP": Qt.Key_U, "DOWN": Qt.Key_J,
@@ -24,8 +22,8 @@ class InputManager(QObject):
 
         # Start the network heartbeat loop
         self.control_timer = QTimer(self)
-        self.control_timer.timeout.connect(self.send_control)
-        self.control_timer.start(HEARTBEAT_SEND)
+        self.control_timer.timeout.connect(self.send_heartbeat)
+        self.control_timer.start(heartbeat_interval)
 
     def load_bindings(self):
         for cmd, default_key in self.default_bindings.items():
@@ -39,16 +37,8 @@ class InputManager(QObject):
             self.settings.setValue(cmd, key)
         self.load_bindings()
 
-    def send_control(self):
-        """ Sends the continuous heartbeat to the drone """
-        if self.control and self.control.sock:
-            self.update_status_ui(True)
-            try:
-                self.control.send({"cmd": "PING"})  
-            except Exception:
-                self.update_status_ui(False)
-        else:
-            self.update_status_ui(False)
+    def send_heartbeat(self):
+        self.command_requested.emit({"cmd": "PING"})
 
     def key_pressed(self, event):
         if event.isAutoRepeat(): 
@@ -58,7 +48,7 @@ class InputManager(QObject):
             return
 
         self.current_command = cmd
-        self.control.send({"cmd": cmd})
+        self.command_requested.emit({"cmd": cmd})
 
     def key_released(self, event):
         if event.isAutoRepeat(): 
@@ -67,4 +57,4 @@ class InputManager(QObject):
         if cmd in {"W", "S", "A", "D", "UP", "DOWN"}:
             if self.current_command == cmd:
                 self.current_command = "STOP"
-                self.control.send({"cmd": "STOP"})
+                self.command_requested.emit({"cmd": "STOP"})
