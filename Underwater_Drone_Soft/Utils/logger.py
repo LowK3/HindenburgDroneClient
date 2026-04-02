@@ -1,4 +1,10 @@
-import sys, time, logging, os, traceback, platform, subprocess
+import sys
+import time
+import logging
+import os
+import traceback
+import platform
+import subprocess
 from logging.handlers import RotatingFileHandler
 from config import LOG_PREFIX
 

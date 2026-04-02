@@ -1,4 +1,7 @@
-import socket, traceback, json, threading
+import socket
+import traceback
+import json
+import threading
 from PySide6.QtCore import QObject, Signal
 from config import CONTROL_TCP_PORT, CONTROL_TIMEOUT, TIMEOUT
 from Utils.logger import log
@@ -29,7 +32,7 @@ class ControlClient(QObject):
             self.sock = None
             return False
 
-    def is_connected(self) -> bool:
+    def is_connected(self):
         return self.sock is not None
 
     def send(self, payload: dict):
@@ -55,18 +58,7 @@ class ControlClient(QObject):
                 if not data:
                     break
                 buffer.extend(data)
-                
-                while (newline_idx := buffer.find(b"\n")) != -1:
-                    msg_bytes = buffer[:newline_idx]
-                    del buffer[:newline_idx + 1]
-                    if msg_bytes:
-                        try:
-                            msg_str = msg_bytes.decode('utf-8').strip()
-                            payload = json.loads(msg_str)
-                            if payload.get("type") == "TELEMETRY":
-                                self.telemetry_received.emit(payload)
-                        except (UnicodeDecodeError, json.JSONDecodeError):
-                            pass
+                self._process_buffer(buffer)
             except socket.timeout:
                 continue
             except (OSError, ConnectionAbortedError, ConnectionResetError):
@@ -75,6 +67,22 @@ class ControlClient(QObject):
             except Exception as e:
                 log(f"Fatal error in receive thread: {e}\n{traceback.format_exc()}")
                 break
+
+    def _process_buffer(self, buffer: bytearray) -> None:
+        while (newline_idx := buffer.find(b"\n")) != -1:
+            msg_bytes = buffer[:newline_idx]
+            del buffer[:newline_idx + 1]
+            if msg_bytes:
+                self._decode_and_emit(msg_bytes)
+
+    def _decode_and_emit(self, msg_bytes: bytes) -> None:
+        try:
+            msg_str = msg_bytes.decode('utf-8').strip()
+            payload = json.loads(msg_str)
+            if payload.get("type") == "TELEMETRY":
+                self.telemetry_received.emit(payload)
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            pass
 
     def stop(self):
         self._stop_event.set()
