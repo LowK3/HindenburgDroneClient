@@ -52,7 +52,7 @@ class VideoClient:
 
                     try:
                         return simplejpeg.decode_jpeg(data, colorspace='RGB')
-                    except:
+                    except Exception:
                         return None
             except socket.timeout:
                 if time.time() - self.last_data_time > DATA_WAIT:

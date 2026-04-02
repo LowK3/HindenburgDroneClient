@@ -9,18 +9,11 @@ class DiscoveryClient:
     def __init__(self):
         self.sock = None
 
-    def create_socket(self):
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        s.bind(("0.0.0.0", 0))
-        s.settimeout(UDP_TIMEOUT)
-        return s
-
     def discover(self):
         """Broadcast PC_CLIENT and wait for PI_SERVER:<port> response."""
         try:
             if self.sock is None:
-                self.sock = self.create_socket()
+                self.sock = self._create_socket()
 
             self.sock.sendto(b"PC_CLIENT", ("<broadcast>", UDP_PORT))
 
@@ -43,9 +36,16 @@ class DiscoveryClient:
             print("No discovery reply received")
         except Exception as e:
             log(f"Discovery error: {e}\n{traceback.format_exc()}")
-        finally:
+            # finally:
             self.stop()
         return None, None
+
+    def _create_socket(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        s.bind(("0.0.0.0", 0))
+        s.settimeout(UDP_TIMEOUT)
+        return s
 
     def stop(self):
         if self.sock:

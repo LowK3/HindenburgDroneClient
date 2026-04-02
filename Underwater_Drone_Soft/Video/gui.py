@@ -1,4 +1,5 @@
-﻿import cv2, time
+﻿import cv2
+import time
 from PySide6.QtWidgets import (
     QMainWindow, QLabel, QPushButton, QVBoxLayout, 
     QWidget, QGridLayout, QHBoxLayout
@@ -29,7 +30,7 @@ class VideoWindow(QMainWindow):
         self.input.command_requested.connect(self.control.send)
 
         self.timer = QTimer()
-        self.timer.timeout.connect(self.update_frame)
+        self.timer.timeout.connect(self._update_frame)
         self.timer.start(16)
         self.last_frame_time = time.time()
 
@@ -92,7 +93,7 @@ class VideoWindow(QMainWindow):
         self.info_button.setFixedSize(90, 50)
         self.info_button.setStyleSheet(INFO_BTN_STYLE)
         tl_layout.addWidget(self.info_button, alignment=Qt.AlignTop | Qt.AlignLeft)
-        self.info_button.clicked.connect(self.open_info_page_safely)
+        self.info_button.clicked.connect(self._open_info_page_safely)
 
         self.left_telemetry_panel = LeftTelemetryWidget()
         tl_layout.addWidget(self.left_telemetry_panel, alignment=Qt.AlignTop | Qt.AlignLeft)
@@ -135,18 +136,18 @@ class VideoWindow(QMainWindow):
         super().resizeEvent(event)
 
     # --- HUD STATUS UPDATES ---
-    def update_video_status(self, connected):
+    def _update_video_status(self, connected):
         self.conn_panel.update_video_status(connected)
 
-    def update_control_status(self, connected):
+    def _update_control_status(self, connected):
         self.conn_panel.update_control_status(connected)
 
         if not connected:
             self.warning_panel.reset_ui()
 
     # --- VIDEO RENDERING ---
-    def update_frame(self):
-        self.update_control_status(self.control.is_connected())
+    def _update_frame(self):
+        self._update_control_status(self.control.is_connected())
 
         if self.overlay.isVisible():
             return 
@@ -162,20 +163,20 @@ class VideoWindow(QMainWindow):
         if frame is None:
             self.video_label.setPixmap(QPixmap())
             self.waiting_label.show()
-            self.update_video_status(False)
+            self._update_video_status(False)
             return
 
         if time.time() - self.last_frame_time > UDP_TIMEOUT:
             self.video_label.setPixmap(QPixmap())
             self.waiting_label.show()
-            self.update_video_status(False)
+            self._update_video_status(False)
             return
 
         if not has_new or frame is None:
             return
 
         self.waiting_label.hide()
-        self.update_video_status(True)
+        self._update_video_status(True)
 
         # FPS counter for testing
         self.fps_frame_count += 1
@@ -197,28 +198,28 @@ class VideoWindow(QMainWindow):
 
     # --- FULLSCREEN MANAGEMENT ---
     def _create_actions(self):
-        self.action_toggle_fullscreen = QAction("Toggle Fullscreen", self)
-        self.action_toggle_fullscreen.setShortcut("F11")
-        self.action_toggle_fullscreen.triggered.connect(self.toggle_fullscreen)
-        self.addAction(self.action_toggle_fullscreen)
+        self.action__toggle_fullscreen = QAction("Toggle Fullscreen", self)
+        self.action__toggle_fullscreen.setShortcut("F11")
+        self.action__toggle_fullscreen.triggered.connect(self._toggle_fullscreen)
+        self.addAction(self.action__toggle_fullscreen)
 
         self.action_toggle_menu = QAction("Toggle Menu", self)
         self.action_toggle_menu.setShortcut("Esc")
-        self.action_toggle_menu.triggered.connect(self.toggle_menu_safely)
+        self.action_toggle_menu.triggered.connect(self._toggle_menu_safely)
         self.addAction(self.action_toggle_menu)
 
-    def toggle_fullscreen(self):
+    def _toggle_fullscreen(self):
         if self.isFullScreen():
             self.showMaximized()
         else:
             self.showFullScreen()
 
     # --- OPEN MENUS SAFELY ---
-    def open_info_page_safely(self):
+    def _open_info_page_safely(self):
         self.input.current_command = "STOP"
         self.overlay.show_info_page()
 
-    def toggle_menu_safely(self):
+    def _toggle_menu_safely(self):
         if not self.overlay.isVisible():
             self.input.current_command = "STOP"
         self.overlay.toggle_menu()

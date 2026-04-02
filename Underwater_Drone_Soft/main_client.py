@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QApplication
 from Video.gui import VideoWindow
 from Utils.frame_buffer import FrameBuffer
 from Network.network_worker import NetworkWorker
-from Utils.logger import log
+from Utils.logger import log, setup_logging
 
 class ClientApp:
     def __init__(self):
@@ -12,6 +12,8 @@ class ClientApp:
         self.stop_event = threading.Event()
 
     def run(self):
+        setup_logging()
+
         # Start networking thread
         net = NetworkWorker(self.fb, self.stop_event)
         net_thread = threading.Thread(target=net.run, daemon=True)

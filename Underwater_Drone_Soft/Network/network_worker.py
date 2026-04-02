@@ -22,7 +22,7 @@ class NetworkWorker:
             self._stop_connection()
             
             if not self.stop_event.is_set():
-                log("Disconnected. Returning to discovery...")
+                print("Disconnected. Returning to discovery...")
             time.sleep(CON_INTERVAL)
         log("Network shut down.")
 

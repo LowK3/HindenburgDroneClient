@@ -24,7 +24,7 @@ class ControlClient(QObject):
             log(f"Control TCP connected to {ip}:{CONTROL_TCP_PORT}.")
 
             self._stop_event.clear()
-            threading.Thread(target=self.receive, daemon=True).start()
+            threading.Thread(target=self._receive, daemon=True).start()
 
             return True
         except Exception as e:
@@ -43,12 +43,12 @@ class ControlClient(QObject):
             self.sock.sendall(data_str.encode())
         except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError):
             log("Control TCP disconnected by server.")
-            self.stop()
+            self._stop_event.set()
         except Exception as e:
             log(f"Control send error: {e}\n{traceback.format_exc()}")
-            self.stop()
+            self._stop_event.set()
 
-    def receive(self):
+    def _receive(self):
         """ Background thread that catches telemetry from the server """
         buffer = bytearray()
         while not self._stop_event.is_set() and self.is_connected():

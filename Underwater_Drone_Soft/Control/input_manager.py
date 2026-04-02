@@ -22,7 +22,7 @@ class InputManager(QObject):
 
         # Start the network heartbeat loop
         self.control_timer = QTimer(self)
-        self.control_timer.timeout.connect(self.send_heartbeat)
+        self.control_timer.timeout.connect(self._send_heartbeat)
         self.control_timer.start(heartbeat_interval)
 
     def load_bindings(self):
@@ -37,7 +37,7 @@ class InputManager(QObject):
             self.settings.setValue(cmd, key)
         self.load_bindings()
 
-    def send_heartbeat(self):
+    def _send_heartbeat(self):
         self.command_requested.emit({"cmd": "PING"})
 
     def key_pressed(self, event):
