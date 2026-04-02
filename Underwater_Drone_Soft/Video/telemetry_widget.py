@@ -32,7 +32,7 @@ class LeftTelemetryWidget(QWidget):
         self.tel_power.setStyleSheet(TEXT_BOLD)
         layout.addWidget(self.tel_power)
 
-    def update_ui(self, data):
+    def update_ui(self, data: dict):
         """ Triggered automatically by the network listener """
         self.tel_temp.setText(f"TEMP: {data['cpu_temp']} °C")
         self.tel_cpu.setText(f"CPU: {data['cpu_usage']} %")
@@ -91,7 +91,7 @@ class RightTelemetryWidget(QWidget):
         self.tel_roll.setStyleSheet(TEXT_BOLD)
         layout.addWidget(self.tel_roll)
 
-    def update_ui(self, data):
+    def update_ui(self, data: dict):
         front_pct = data.get("front_power", 0)
         rear_pct = data.get("rear_power", 0)
         self.tel_front_pwr.setText(f"FRONT PWR: {front_pct} %")
@@ -136,7 +136,7 @@ class WarningWidget(QWidget):
 
         layout.addStretch()
 
-    def update_ui(self, data):
+    def update_ui(self, data: dict):
         if data.get("leak_detected", False):
             self.leak_label.setText("WARNING! WATER DETECTED INSIDE THE HULL")
             self.leak_label.show()

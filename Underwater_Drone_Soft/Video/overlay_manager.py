@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QStackedLayout, QLabel, 
-    QPushButton, QGraphicsBlurEffect
+    QPushButton, QGraphicsBlurEffect, QMainWindow
 )
 from PySide6.QtCore import Qt
 from Video.main_menu_widget import MainMenuWidget
@@ -13,7 +13,7 @@ from Video.styles import MAIN_PANEL_STYLE, TITLE_TEXT, MENU_BTN_STYLE
 
 class OverlayManager(QWidget):
     """ Handles all menus, popups, and screen blurring for the main window """
-    def __init__(self, main_window):
+    def __init__(self, main_window: QMainWindow):
         super().__init__(main_window.centralWidget())
         self.main = main_window
         self.setAttribute(Qt.WA_StyledBackground, True)

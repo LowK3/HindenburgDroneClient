@@ -30,8 +30,8 @@ class ConnectionHud(QWidget):
         conn_layout.addWidget(self.ctrl_dot)
         conn_layout.addWidget(self.ctrl_text)
 
-    def update_video_status(self, connected):
+    def update_video_status(self, connected: bool):
         self.vid_dot.setStyleSheet(get_status_dot_style(connected))
 
-    def update_control_status(self, connected):
+    def update_control_status(self, connected: bool):
         self.ctrl_dot.setStyleSheet(get_status_dot_style(connected))

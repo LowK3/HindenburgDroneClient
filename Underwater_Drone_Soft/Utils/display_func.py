@@ -1,7 +1,8 @@
 import cv2
+import numpy as np
 from PySide6.QtGui import QImage, QPixmap
 
-def create_qpixmap(frame, target_width, target_height):
+def create_qpixmap(frame: np.ndarray, target_width: int, target_height: int):
     """
     Resizes an OpenCV frame to fit within target dimensions 
     and converts it to a PySide6 QPixmap.
