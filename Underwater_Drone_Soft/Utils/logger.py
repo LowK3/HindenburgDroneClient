@@ -6,22 +6,23 @@ import traceback
 import platform
 import subprocess
 from logging.handlers import RotatingFileHandler
-from config import LOG_PREFIX
+from config import LOG_PREFIX, LOG_DIR, LOG_MAX_BYTES, LOG_BACKUP_COUNT
 
 logger = logging.getLogger("DroneClient")
 
 def setup_logging():
-    LOG_DIR = "logs"
     if not os.path.exists(LOG_DIR):
         os.makedirs(LOG_DIR)
 
     LOG_FILE = os.path.join(LOG_DIR, "system.log")
     logger.setLevel(logging.INFO)
 
-    file_handler = RotatingFileHandler(LOG_FILE, maxBytes=5 * 1024 * 1024, backupCount=2)
+    file_handler = RotatingFileHandler(LOG_FILE, maxBytes=LOG_MAX_BYTES, backupCount=LOG_BACKUP_COUNT)
     formatter = logging.Formatter("[CLIENT] [%(asctime)s] | %(message)s", datefmt="%H:%M:%S")
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
+
+    sys.excepthook = global_crash_handler
 
 def log(msg: str):
     ts = time.strftime("%H:%M:%S")

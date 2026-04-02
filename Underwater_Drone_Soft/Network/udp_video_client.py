@@ -2,7 +2,10 @@ import socket
 import struct
 import time
 import simplejpeg
-from config import UDP_VIDEO_PORT, DATA_WAIT
+from config import (
+    UDP_VIDEO_PORT, VIDEO_STREAM_TIMEOUT, UDP_BUFFER_SIZE, VIDEO_HEADER_SIZE, MAGIC_BYTE, 
+    FRAME_BUFFER_LIMIT, UDP_VIDEO_TIMEOUT
+)
 from Utils.logger import log
 
 class VideoClient:
@@ -11,11 +14,11 @@ class VideoClient:
         self.last_data_time = 0
         self.frame_buffer = {}
 
-    def connect(self, ip, port):
+    def connect(self, ip: str, port: int):
         self.stop()
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(("0.0.0.0", UDP_VIDEO_PORT))
-        self.sock.settimeout(1.0)
+        self.sock.settimeout(UDP_VIDEO_TIMEOUT)
         self.last_data_time = time.time()
         log(f"UDP Video client bound to port {UDP_VIDEO_PORT}.")
         return True
@@ -26,18 +29,18 @@ class VideoClient:
 
         while True:
             try:
-                packet, addr = self.sock.recvfrom(65536)  # Buffer size large enough for UDP packet
+                packet, addr = self.sock.recvfrom(UDP_BUFFER_SIZE)
                 self.last_data_time = time.time()
 
-                if len(packet) < 7: continue
+                if len(packet) < VIDEO_HEADER_SIZE: continue
 
-                magic, frame_id, chunk_idx, total_chunks = struct.unpack("<BIBB", packet[:7])
-                if magic != 0xAA: continue
+                magic, frame_id, chunk_idx, total_chunks = struct.unpack("<BIBB", packet[:VIDEO_HEADER_SIZE])
+                if magic != MAGIC_BYTE: continue
 
                 if frame_id not in self.frame_buffer:
                     self.frame_buffer[frame_id] = {}
 
-                self.frame_buffer[frame_id][chunk_idx] = packet[7:]
+                self.frame_buffer[frame_id][chunk_idx] = packet[VIDEO_HEADER_SIZE:]
 
                 # If we have received all chunks for this frame
                 if len(self.frame_buffer[frame_id]) == total_chunks:
@@ -47,7 +50,7 @@ class VideoClient:
                     keys_to_delete = [k for k in self.frame_buffer.keys() if k <= frame_id]
                     for k in keys_to_delete: del self.frame_buffer[k]
 
-                    if len(self.frame_buffer) > 100:
+                    if len(self.frame_buffer) > FRAME_BUFFER_LIMIT:
                         self.frame_buffer.clear()
 
                     try:
@@ -55,7 +58,7 @@ class VideoClient:
                     except Exception:
                         return None
             except socket.timeout:
-                if time.time() - self.last_data_time > DATA_WAIT:
+                if time.time() - self.last_data_time > VIDEO_STREAM_TIMEOUT:
                     raise TimeoutError("No video data from server.")
                 return None
             except Exception as e:

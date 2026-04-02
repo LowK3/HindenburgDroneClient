@@ -1,6 +1,7 @@
 ﻿from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
 from PySide6.QtCore import Qt, Signal
 from Video.styles import CONNECTION_PANEL_STYLE, TITLE_2_TEXT, TEXT_BOLD, ALERT_TEXT, WARNING_TEXT
+from config import ALERT_CPU_TEMP, ALERT_HULL_HUM
 
 class LeftTelemetryWidget(QWidget):
     def __init__(self, parent=None):
@@ -38,7 +39,7 @@ class LeftTelemetryWidget(QWidget):
         self.tel_cpu.setText(f"CPU: {data['cpu_usage']} %")
         self.tel_ram.setText(f"RAM: {data['ram_usage']} %")
         
-        if data['cpu_temp'] > 75.0:
+        if data['cpu_temp'] > ALERT_CPU_TEMP:
             self.tel_temp.setText(f"⚠️ CPU TEMP: {data['cpu_temp']} °C")
             self.tel_temp.setStyleSheet(ALERT_TEXT)
         else:
@@ -102,7 +103,7 @@ class RightTelemetryWidget(QWidget):
         self.tel_hull_temp.setText(f"HULL TEMP: {hull_temp} °C")
         self.tel_hull_hum.setText(f"HULL HUM: {hull_hum} %")
 
-        if hull_hum > 65.0:
+        if hull_hum > ALERT_HULL_HUM:
             self.tel_hull_hum.setText(f"⚠️ HULL HUM: {hull_hum} %")
             self.tel_hull_hum.setStyleSheet(ALERT_TEXT)
         else:

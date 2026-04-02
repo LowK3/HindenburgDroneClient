@@ -1,7 +1,10 @@
 import socket
 import time
 import traceback
-from config import UDP_PORT, UDP_TIMEOUT, CON_INTERVAL
+from config import (
+    UDP_DISCOVERY_PORT, UDP_TIMEOUT, CON_INTERVAL, HANDSHAKE_EXPECTED, HANDSHAKE_REPLY_PREFIX,
+    DISCOVERY_RECV_CHUNK
+)
 from Utils.logger import log
 
 class DiscoveryClient:
@@ -15,18 +18,18 @@ class DiscoveryClient:
             if self.sock is None:
                 self.sock = self._create_socket()
 
-            self.sock.sendto(b"PC_CLIENT", ("<broadcast>", UDP_PORT))
+            self.sock.sendto(HANDSHAKE_EXPECTED, ("<broadcast>", UDP_DISCOVERY_PORT))
 
             start = time.time()
             while time.time() - start < UDP_TIMEOUT:
                 try:
-                    data, addr = self.sock.recvfrom(1024)
+                    data, addr = self.sock.recvfrom(DISCOVERY_RECV_CHUNK)
                 except socket.timeout:
                     break
                 if not data:
                     continue
                 msg = data.decode(errors="ignore")
-                if msg.startswith("PI_SERVER:"):
+                if msg.startswith(f"{HANDSHAKE_REPLY_PREFIX}:"):
                     try:
                         port = int(msg.split(":")[1])
                     except (IndexError, ValueError):

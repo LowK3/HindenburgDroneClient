@@ -1,22 +1,41 @@
-""" Video network ports """
-UDP_PORT = 37020
+# --- Ports ---
+UDP_DISCOVERY_PORT = 37020
 UDP_VIDEO_PORT = 8486
-
-""" Engine control port """
 CONTROL_TCP_PORT = 8600 
 
-""" Connection timeouts """
+# --- Discovery Protocol ---
+HANDSHAKE_EXPECTED = b"PC_CLIENT"
+HANDSHAKE_REPLY_PREFIX = "PI_SERVER"
+
+# --- Network settings ---
+UDP_BUFFER_SIZE = 65536
+TCP_RECV_CHUNK = 1024
+DISCOVERY_RECV_CHUNK = 1024
+
+# --- Timeouts, Timers and Rates ---
 UDP_TIMEOUT = 1.0
-CONTROL_TIMEOUT = 1.0
-
-TIMEOUT = 0.5
-DATA_WAIT = 0.5
+UDP_VIDEO_TIMEOUT = 1.0
+TCP_RECV_TIMEOUT = 0.5
+TCP_CONNECT_TIMEOUT = 1.0
+VIDEO_STREAM_TIMEOUT = 0.5
 CON_INTERVAL = 0.5
+HEARTBEAT_INTERVAL = 200 # In ms
+GUI_REFRESH_RATE = 16 # In ms, ~60 FPS
 
-HEARTBEAT_TIMER = 200 # 0.2 seconds
+# --- Video Decoding ---
+VIDEO_HEADER_SIZE = 7
+MAGIC_BYTE = 0xAA
+FRAME_BUFFER_LIMIT = 100
 
-""" Logging """
+# --- Logging ---
 LOG_PREFIX = "[CLIENT]"
+LOG_DIR = "logs"
+LOG_MAX_BYTES = 5 * 1024 * 1024
+LOG_BACKUP_COUNT = 2
 
-""" Video display settings """
+# --- Telemetry Alert Thresholds ---
+ALERT_CPU_TEMP = 75.0
+ALERT_HULL_HUM = 65.0
+
+# --- Video display settings ---
 WINDOW_NAME = "Hindenburg Drone Controller"

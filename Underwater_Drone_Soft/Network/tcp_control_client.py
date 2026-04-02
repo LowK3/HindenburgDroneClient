@@ -3,7 +3,7 @@ import traceback
 import json
 import threading
 from PySide6.QtCore import QObject, Signal
-from config import CONTROL_TCP_PORT, CONTROL_TIMEOUT, TIMEOUT
+from config import CONTROL_TCP_PORT, TCP_CONNECT_TIMEOUT, TCP_RECV_TIMEOUT, TCP_RECV_CHUNK
 from Utils.logger import log
 
 class ControlClient(QObject):
@@ -15,9 +15,9 @@ class ControlClient(QObject):
         self.sock = None
         self._stop_event = threading.Event()
 
-    def connect(self, ip):
+    def connect(self, ip: str):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.settimeout(CONTROL_TIMEOUT)
+        self.sock.settimeout(TCP_CONNECT_TIMEOUT)
         try:
             self.sock.connect((ip, CONTROL_TCP_PORT))
             self.sock.settimeout(None)
@@ -53,8 +53,8 @@ class ControlClient(QObject):
         buffer = bytearray()
         while not self._stop_event.is_set() and self.is_connected():
             try:
-                self.sock.settimeout(TIMEOUT)
-                data = self.sock.recv(1024)
+                self.sock.settimeout(TCP_RECV_TIMEOUT)
+                data = self.sock.recv(TCP_RECV_CHUNK)
                 if not data:
                     break
                 buffer.extend(data)
@@ -68,14 +68,14 @@ class ControlClient(QObject):
                 log(f"Fatal error in receive thread: {e}\n{traceback.format_exc()}")
                 break
 
-    def _process_buffer(self, buffer: bytearray) -> None:
+    def _process_buffer(self, buffer: bytearray):
         while (newline_idx := buffer.find(b"\n")) != -1:
             msg_bytes = buffer[:newline_idx]
             del buffer[:newline_idx + 1]
             if msg_bytes:
                 self._decode_and_emit(msg_bytes)
 
-    def _decode_and_emit(self, msg_bytes: bytes) -> None:
+    def _decode_and_emit(self, msg_bytes: bytes):
         try:
             msg_str = msg_bytes.decode('utf-8').strip()
             payload = json.loads(msg_str)
