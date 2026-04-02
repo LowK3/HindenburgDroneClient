@@ -1,4 +1,7 @@
-import socket, struct, cv2, numpy as np, time, traceback, simplejpeg
+import socket
+import struct
+import time
+import simplejpeg
 from config import UDP_VIDEO_PORT, DATA_WAIT
 from Utils.logger import log
 

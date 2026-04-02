@@ -1,4 +1,6 @@
-import socket, time, traceback
+import socket
+import time
+import traceback
 from config import UDP_PORT, UDP_TIMEOUT, CON_INTERVAL
 from Utils.logger import log
 
@@ -34,7 +36,7 @@ class DiscoveryClient:
                 if msg.startswith("PI_SERVER:"):
                     try:
                         port = int(msg.split(":")[1])
-                    except:
+                    except (IndexError, ValueError):
                         continue
                     log(f"Discovered server at {addr[0]}:{port}")
                     return addr[0], port
