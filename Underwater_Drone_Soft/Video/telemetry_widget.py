@@ -45,7 +45,7 @@ class LeftTelemetryWidget(QWidget):
         else:
             self.tel_temp.setStyleSheet(TEXT_BOLD)
 
-        if data.get('low_power', False):
+        if data.get('low_pwr', False):
             self.tel_power.setText("⚠️ WARNING! LOW VOLTAGE")
             self.tel_power.setStyleSheet(ALERT_TEXT)
         else:
@@ -93,8 +93,8 @@ class RightTelemetryWidget(QWidget):
         layout.addWidget(self.tel_roll)
 
     def update_ui(self, data: dict):
-        front_pct = data.get("front_power", 0)
-        rear_pct = data.get("rear_power", 0)
+        front_pct = data.get("front_pwr", 0)
+        rear_pct = data.get("front_pwr", 0)
         self.tel_front_pwr.setText(f"FRONT PWR: {front_pct} %")
         self.tel_rear_pwr.setText(f"REAR PWR: {rear_pct} %")
 

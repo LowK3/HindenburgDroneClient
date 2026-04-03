@@ -1,10 +1,11 @@
 from PySide6.QtCore import QObject, QTimer, Qt, QSettings, Signal
+from config import HEARTBEAT_INTERVAL
 
 class InputManager(QObject):
     """ Handles keybinds, saving settings, and sending network commands. """
     command_requested = Signal(dict)
 
-    def __init__(self, heartbeat_interval: int):
+    def __init__(self):
         super().__init__()
         self.current_command = "STOP"
         
@@ -23,7 +24,7 @@ class InputManager(QObject):
         # Start the network heartbeat loop
         self.control_timer = QTimer(self)
         self.control_timer.timeout.connect(self._send_heartbeat)
-        self.control_timer.start(heartbeat_interval)
+        self.control_timer.start(HEARTBEAT_INTERVAL)
 
     def load_bindings(self):
         for cmd, default_key in self.default_bindings.items():

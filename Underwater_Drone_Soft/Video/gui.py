@@ -12,7 +12,7 @@ from Video.connection_hud import ConnectionHud
 from Video.telemetry_widget import LeftTelemetryWidget, RightTelemetryWidget, WarningWidget
 from Utils.display_func import create_qpixmap
 from Utils.logger import log
-from config import WINDOW_NAME, UDP_TIMEOUT, HEARTBEAT_INTERVAL, GUI_REFRESH_RATE
+from config import WINDOW_NAME, UDP_TIMEOUT, GUI_REFRESH_RATE
 from Video.styles import (
     MAIN_PANEL_STYLE, CONNECTION_PANEL_STYLE, INFO_BTN_STYLE, ACCENT_GREEN, ACCENT_RED, 
     WAITING_TITLE, get_status_dot_style
@@ -26,7 +26,7 @@ class VideoWindow(QMainWindow):
         self.setWindowTitle(WINDOW_NAME)
 
         # 1. Setup Data & Timers
-        self.input = InputManager(HEARTBEAT_INTERVAL)
+        self.input = InputManager()
         self.input.command_requested.connect(self.control.send)
 
         self.timer = QTimer()
