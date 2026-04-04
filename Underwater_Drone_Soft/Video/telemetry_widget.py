@@ -1,5 +1,6 @@
 ﻿from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
 from PySide6.QtCore import Qt, Signal
+from Video.gyro_widget import ArtificialHorizon
 from Video.styles import CONNECTION_PANEL_STYLE, TITLE_2_TEXT, TEXT_BOLD, ALERT_TEXT, WARNING_TEXT
 from config import ALERT_CPU_TEMP, ALERT_HULL_HUM
 
@@ -92,6 +93,10 @@ class RightTelemetryWidget(QWidget):
         self.tel_roll.setStyleSheet(TEXT_BOLD)
         layout.addWidget(self.tel_roll)
 
+        self.horizon = ArtificialHorizon()
+        layout.addSpacing(10)
+        layout.addWidget(self.horizon, alignment=Qt.AlignHCenter)
+
     def update_ui(self, data: dict):
         front_pct = data.get("front_pwr", 0)
         rear_pct = data.get("front_pwr", 0)
@@ -112,6 +117,7 @@ class RightTelemetryWidget(QWidget):
 
         pitch = data.get("pitch", 0.0)
         roll = data.get("roll", 0.0)
+        self.horizon.update_angles(pitch, roll)
         self.tel_pitch.setText(f"PITCH: {pitch} °")
         self.tel_roll.setText(f"ROLL: {roll} °")
 

@@ -39,6 +39,7 @@
     <Compile Include="Video\confirm_widget.py" />
     <Compile Include="Video\connection_hud.py" />
     <Compile Include="Video\gui.py" />
+    <Compile Include="Video\gyro_widget.py" />
     <Compile Include="Video\info_widget.py" />
     <Compile Include="Video\main_menu_widget.py" />
     <Compile Include="Video\overlay_manager.py" />
