@@ -86,7 +86,7 @@ class VideoWindow(QMainWindow):
         # --- Top-left container for info button and telemetry ---
         self.top_left_container = QWidget()
         tl_layout = QVBoxLayout(self.top_left_container)
-        tl_layout.setContentsMargins(0, 0, 0, 0)
+        tl_layout.setContentsMargins(10, 10, 0, 10)
         tl_layout.setSpacing(20)
 
         self.info_button = QPushButton("INFO")
@@ -103,7 +103,7 @@ class VideoWindow(QMainWindow):
         # --- Top-right container for connection status and telemetry ---
         self.top_right_container = QWidget()
         tr_layout = QVBoxLayout(self.top_right_container)
-        tr_layout.setContentsMargins(0, 0, 0, 0)
+        tr_layout.setContentsMargins(0, 10, 10, 10)
         tr_layout.setSpacing(20)
 
         self.conn_panel = ConnectionHud()

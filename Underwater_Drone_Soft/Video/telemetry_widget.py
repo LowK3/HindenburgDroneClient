@@ -10,16 +10,15 @@ class LeftTelemetryWidget(QWidget):
         self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(10, 5, 10, 10)
         layout.setSpacing(8)
 
         self.title = QLabel("RASPBERRY PI DATA")
         self.title.setStyleSheet(TITLE_2_TEXT)
-        self.title.setContentsMargins(0, 0, 0, 15)
         layout.addWidget(self.title)
 
         self.tel_temp = QLabel("CPU TEMP: -- °C")
         self.tel_temp.setStyleSheet(TEXT_BOLD)
+        layout.addSpacing(15)
         layout.addWidget(self.tel_temp)
         
         self.tel_cpu = QLabel("CPU: -- %")
@@ -58,44 +57,50 @@ class RightTelemetryWidget(QWidget):
         self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(10, 5, 10, 10)
         layout.setSpacing(8)
+
+        self.horizon = ArtificialHorizon()
+        layout.addWidget(self.horizon, alignment=Qt.AlignHCenter)
 
         self.title = QLabel("DRONE DATA")
         self.title.setStyleSheet(TITLE_2_TEXT)
-        self.title.setContentsMargins(0, 0, 0, 15)
+        layout.addSpacing(25)
+        self.title.setAlignment(Qt.AlignRight)
         layout.addWidget(self.title)
 
         self.tel_front_pwr = QLabel("FRONT PWR: -- %")
         self.tel_front_pwr.setStyleSheet(TEXT_BOLD)
+        layout.addSpacing(15)
+        self.tel_front_pwr.setAlignment(Qt.AlignRight)
         layout.addWidget(self.tel_front_pwr)
 
         self.tel_rear_pwr = QLabel("REAR PWR: -- %")
         self.tel_rear_pwr.setStyleSheet(TEXT_BOLD)
-        self.tel_rear_pwr.setContentsMargins(0, 0, 0, 15)
+        self.tel_rear_pwr.setAlignment(Qt.AlignRight)
         layout.addWidget(self.tel_rear_pwr)
 
 
         self.tel_hull_temp = QLabel("HULL TEMP: -- °C")
         self.tel_hull_temp.setStyleSheet(TEXT_BOLD)
+        layout.addSpacing(15)
+        self.tel_hull_temp.setAlignment(Qt.AlignRight)
         layout.addWidget(self.tel_hull_temp)
 
         self.tel_hull_hum = QLabel("HULL HUM: -- %")
         self.tel_hull_hum.setStyleSheet(TEXT_BOLD)
-        self.tel_hull_hum.setContentsMargins(0, 0, 0, 15)
+        self.tel_hull_hum.setAlignment(Qt.AlignRight)
         layout.addWidget(self.tel_hull_hum)
 
         self.tel_pitch = QLabel("PITCH: -- °")
         self.tel_pitch.setStyleSheet(TEXT_BOLD)
+        layout.addSpacing(15)
+        self.tel_pitch.setAlignment(Qt.AlignRight)
         layout.addWidget(self.tel_pitch)
         
         self.tel_roll = QLabel("ROLL: -- °")
         self.tel_roll.setStyleSheet(TEXT_BOLD)
+        self.tel_roll.setAlignment(Qt.AlignRight)
         layout.addWidget(self.tel_roll)
-
-        self.horizon = ArtificialHorizon()
-        layout.addSpacing(10)
-        layout.addWidget(self.horizon, alignment=Qt.AlignHCenter)
 
     def update_ui(self, data: dict):
         front_pct = data.get("front_pwr", 0)
