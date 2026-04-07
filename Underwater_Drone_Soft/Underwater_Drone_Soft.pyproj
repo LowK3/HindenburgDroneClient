@@ -12,6 +12,10 @@
     <OutputPath>.</OutputPath>
     <Name>Underwater_Drone_Soft</Name>
     <RootNamespace>Underwater_Drone_Soft</RootNamespace>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <EnableNativeCodeDebugging>True</EnableNativeCodeDebugging>
+    <Environment>
+    </Environment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
