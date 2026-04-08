@@ -64,14 +64,14 @@ class RightTelemetryWidget(QWidget):
 
         self.title = QLabel("DRONE DATA")
         self.title.setStyleSheet(TITLE_2_TEXT)
-        layout.addSpacing(25)
         self.title.setAlignment(Qt.AlignRight)
+        layout.addSpacing(25)
         layout.addWidget(self.title)
 
         self.tel_front_pwr = QLabel("FRONT PWR: -- %")
         self.tel_front_pwr.setStyleSheet(TEXT_BOLD)
-        layout.addSpacing(15)
         self.tel_front_pwr.setAlignment(Qt.AlignRight)
+        layout.addSpacing(15)
         layout.addWidget(self.tel_front_pwr)
 
         self.tel_rear_pwr = QLabel("REAR PWR: -- %")
@@ -82,8 +82,8 @@ class RightTelemetryWidget(QWidget):
 
         self.tel_hull_temp = QLabel("HULL TEMP: -- °C")
         self.tel_hull_temp.setStyleSheet(TEXT_BOLD)
-        layout.addSpacing(15)
         self.tel_hull_temp.setAlignment(Qt.AlignRight)
+        layout.addSpacing(15)
         layout.addWidget(self.tel_hull_temp)
 
         self.tel_hull_hum = QLabel("HULL HUM: -- %")
@@ -91,10 +91,15 @@ class RightTelemetryWidget(QWidget):
         self.tel_hull_hum.setAlignment(Qt.AlignRight)
         layout.addWidget(self.tel_hull_hum)
 
+        self.tel_hull_press = QLabel("HULL PRESS: -- mbar")
+        self.tel_hull_press.setStyleSheet(TEXT_BOLD)
+        self.tel_hull_press.setAlignment(Qt.AlignRight)
+        layout.addWidget(self.tel_hull_press)
+
         self.tel_pitch = QLabel("PITCH: -- °")
         self.tel_pitch.setStyleSheet(TEXT_BOLD)
-        layout.addSpacing(15)
         self.tel_pitch.setAlignment(Qt.AlignRight)
+        layout.addSpacing(15)
         layout.addWidget(self.tel_pitch)
         
         self.tel_roll = QLabel("ROLL: -- °")
@@ -110,8 +115,10 @@ class RightTelemetryWidget(QWidget):
 
         hull_temp = data.get("hull_temp", 0.0)
         hull_hum = data.get("hull_hum", 0.0)
+        hull_press = data.get('hull_press', 0.0)
         self.tel_hull_temp.setText(f"HULL TEMP: {hull_temp} °C")
         self.tel_hull_hum.setText(f"HULL HUM: {hull_hum} %")
+        self.tel_hull_press.setText(f"HULL PRESS: {hull_press} mbar")
 
         if hull_hum > ALERT_HULL_HUM:
             self.tel_hull_hum.setText(f"⚠️ HULL HUM: {hull_hum} %")
