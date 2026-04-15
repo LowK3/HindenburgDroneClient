@@ -36,8 +36,8 @@ class LeftTelemetryWidget(QWidget):
     def update_ui(self, data: dict):
         """ Triggered automatically by the network listener """
         self.tel_temp.setText(f"TEMP: {data['cpu_temp']} °C")
-        self.tel_cpu.setText(f"CPU: {data['cpu_usage']} %")
-        self.tel_ram.setText(f"RAM: {data['ram_usage']} %")
+        self.tel_cpu.setText(f"CPU: {data['cpu_usg']} %")
+        self.tel_ram.setText(f"RAM: {data['ram_usg']} %")
         
         if data['cpu_temp'] > ALERT_CPU_TEMP:
             self.tel_temp.setText(f"⚠️ CPU TEMP: {data['cpu_temp']} °C")
