@@ -109,7 +109,7 @@ class RightTelemetryWidget(QWidget):
 
     def update_ui(self, data: dict):
         front_pct = data.get("front_pwr", 0)
-        rear_pct = data.get("front_pwr", 0)
+        rear_pct = data.get("rear_pwr", 0)
         self.tel_front_pwr.setText(f"FRONT PWR: {front_pct} %")
         self.tel_rear_pwr.setText(f"REAR PWR: {rear_pct} %")
 
