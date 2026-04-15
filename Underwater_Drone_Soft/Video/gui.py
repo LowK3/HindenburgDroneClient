@@ -34,11 +34,6 @@ class VideoWindow(QMainWindow):
         self.timer.start(GUI_REFRESH_RATE)
         self.last_frame_time = time.time()
 
-        # FPS counter
-        self.fps_start_time = time.time()
-        self.fps_frame_count = 0
-        self.current_fps = 0
-
         # 2. Setup the User Interface
         self._setup_ui()
         self._create_actions()
@@ -179,18 +174,6 @@ class VideoWindow(QMainWindow):
 
         self.waiting_label.hide()
         self._update_video_status(True)
-
-        # FPS counter for testing
-        self.fps_frame_count += 1
-        elapsed_time = time.time() - self.fps_start_time
-
-        if elapsed_time >= 1.0:
-            self.current_fps = self.fps_frame_count / elapsed_time
-            self.fps_frame_count = 0
-            self.fps_start_time = time.time()
-
-        fps_text = f"FPS: {int(self.current_fps)}"
-        cv2.putText(frame, fps_text, (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (50, 255, 50), 3)
 
         win_w = self.video_label.width()
         win_h = self.video_label.height()

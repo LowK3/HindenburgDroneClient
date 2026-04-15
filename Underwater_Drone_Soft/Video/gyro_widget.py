@@ -11,7 +11,7 @@ class ArtificialHorizon(QWidget):
         self.roll = 0.0
 
     def update_angles(self, pitch, roll):
-        self.pitch = max(-120.0, min(120.0, pitch))
+        self.pitch = max(-100.0, min(100.0, pitch))
         self.roll = roll
         self.update() 
 
