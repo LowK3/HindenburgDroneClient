@@ -45,10 +45,10 @@ class ControlClient(QObject):
             self.sock.sendall(data_str.encode())
         except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError):
             log("Control TCP disconnected by server.")
-            self._stop_event.set()
+            self.stop()
         except Exception as e:
             log(f"Control send error: {e}\n{traceback.format_exc()}")
-            self._stop_event.set()
+            self.stop()
 
     def _receive(self):
         """ Background thread that catches telemetry from the server """

@@ -44,8 +44,8 @@ class TutorialWidget(QWidget):
             ("1. POWER ON", "Plug the power bank into the Raspberry Pi to start the drone."),
             ("2. CONNECT ETHERNET CABLE", "Connect the drone to your computer via the Ethernet cable."),
             ("3. OPEN PuTTY", "Establish an SSH connection to the Raspberry Pi using PuTTY (Host Name: server)."),
-            ("4. START THE SERVER", "In the PuTTY terminal, navigate to the server repository and run:\n"
-             "  'python3 main_server.py'\n\n"
+            ("4. START THE SERVER", "In the PuTTY terminal run:\n"
+             "  'python3 prj/Drone_Server/Drone_Server/main_server.py'\n\n"
              "(Note: In the future, the server will start automatically when Raspberry is powered on)."),
             ("5. CONNECT", "Launch the Hindenburg Windows application. The connection between the drone and "
              "server will be established automatically."),
