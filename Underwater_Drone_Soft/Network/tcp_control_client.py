@@ -17,6 +17,8 @@ class ControlClient(QObject):
 
     def connect(self, ip: str):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # Disable Nagle's Algorithm to prevent artificial latency
+        self.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.sock.settimeout(TCP_CONNECT_TIMEOUT)
         try:
             self.sock.connect((ip, CONTROL_TCP_PORT))

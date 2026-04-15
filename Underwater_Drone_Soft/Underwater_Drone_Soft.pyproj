@@ -61,8 +61,6 @@
     <Folder Include="Video\assets\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Video\assets\1.jpg" />
-    <Content Include="Video\assets\2.jpg" />
     <Content Include="Video\assets\3.jpg" />
     <Content Include="Video\assets\6.jpg" />
   </ItemGroup>
