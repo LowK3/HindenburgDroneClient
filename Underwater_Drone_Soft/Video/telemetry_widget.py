@@ -51,6 +51,12 @@ class LeftTelemetryWidget(QWidget):
         else:
             self.tel_power.setStyleSheet(TEXT_BOLD)
 
+    def reset_ui(self):
+        self.tel_temp.setText("CPU TEMP: -- °C")
+        self.tel_cpu.setText("CPU: -- %")
+        self.tel_ram.setText("RAM: -- %")
+        self.tel_power.setText("")
+
 class RightTelemetryWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -132,6 +138,15 @@ class RightTelemetryWidget(QWidget):
         self.horizon.update_angles(pitch, roll)
         self.tel_pitch.setText(f"PITCH: {pitch} °")
         self.tel_roll.setText(f"ROLL: {roll} °")
+
+    def reset_ui(self):
+        self.tel_hull_temp.setText("HULL TEMP: -- °C")
+        self.tel_hull_hum.setText("HULL HUM: -- %")
+        self.tel_hull_press.setText("HULL PRESS: -- mbar")
+        self.tel_front_pwr.setText("FRONT PWR: -- %")
+        self.tel_rear_pwr.setText("REAR PWR: -- %")
+        self.tel_pitch.setText("PITCH: -- °")
+        self.tel_roll.setText("ROLL: -- °")
 
 class WarningWidget(QWidget):
     def __init__(self, parent=None):

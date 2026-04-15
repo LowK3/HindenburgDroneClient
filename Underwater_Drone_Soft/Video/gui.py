@@ -62,7 +62,7 @@ class VideoWindow(QMainWindow):
         central = QWidget()
         self.setCentralWidget(central)
 
-        # --- Video container ---
+        # Video container
         self.video_container = QWidget()
         self.video_layout = QGridLayout(self.video_container)
         self.video_layout.setContentsMargins(0, 0, 0, 0)
@@ -83,7 +83,7 @@ class VideoWindow(QMainWindow):
 
         self.overlay = OverlayManager(self)
 
-        # --- Top-left container for info button and telemetry ---
+        # Top-left container for info button and telemetry
         self.top_left_container = QWidget()
         tl_layout = QVBoxLayout(self.top_left_container)
         tl_layout.setContentsMargins(10, 10, 0, 10)
@@ -100,7 +100,7 @@ class VideoWindow(QMainWindow):
 
         self.video_layout.addWidget(self.top_left_container, 0, 0, alignment=Qt.AlignTop | Qt.AlignLeft)
 
-        # --- Top-right container for connection status and telemetry ---
+        # Top-right container for connection status and telemetry
         self.top_right_container = QWidget()
         tr_layout = QVBoxLayout(self.top_right_container)
         tr_layout.setContentsMargins(0, 10, 10, 10)
@@ -114,7 +114,7 @@ class VideoWindow(QMainWindow):
         
         self.video_layout.addWidget(self.top_right_container, 0, 0, alignment=Qt.AlignTop | Qt.AlignRight)
 
-        # --- Warning overlay ---
+        # Warning overlay
         self.warning_panel = WarningWidget()
         self.video_layout.addWidget(self.warning_panel, 0, 0)
 
@@ -144,6 +144,8 @@ class VideoWindow(QMainWindow):
 
         if not connected:
             self.warning_panel.reset_ui()
+            self.right_telemetry_panel.reset_ui()
+            self.left_telemetry_panel.reset_ui()
 
     # --- VIDEO RENDERING ---
     def _update_frame(self):
