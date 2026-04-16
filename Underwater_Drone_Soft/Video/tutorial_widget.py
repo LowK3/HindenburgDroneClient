@@ -21,7 +21,7 @@ class TutorialWidget(QWidget):
         self.panel = QWidget()
         self.panel.setObjectName("TutorialPanel")
         self.panel.setStyleSheet(MAIN_PANEL_STYLE)
-        self.panel.setFixedSize(900, 750)
+        self.panel.setFixedSize(1100, 850)
         
         panel_layout = QVBoxLayout(self.panel)
         panel_layout.setContentsMargins(30, 30, 30, 30)
@@ -68,13 +68,13 @@ class TutorialWidget(QWidget):
             if i < len(steps) - 3:
                 img_label = QLabel()
                 img_label.setAlignment(Qt.AlignCenter)
-                img_label.setFixedHeight(400)
+                img_label.setFixedHeight(550)
             
                 img_path = os.path.join("Video", "assets", f"{i+1}.jpg")
             
                 if os.path.exists(img_path):
                     pixmap = QPixmap(img_path)
-                    scaled_pixmap = pixmap.scaled(800, 400, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                    scaled_pixmap = pixmap.scaled(1000, 550, Qt.KeepAspectRatio, Qt.SmoothTransformation)
                     img_label.setPixmap(scaled_pixmap)
                 else:
                     img_label.setText(f"Image Missing: {img_path}")
