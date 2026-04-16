@@ -13,7 +13,6 @@ def create_qpixmap(frame: np.ndarray, target_width: int, target_height: int):
     new_h = int(frame_h * scale)
 
     frame_resized = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
-    frame_resized = frame_resized[:, :, ::-1].copy() 
 
-    qt_img = QImage(frame_resized.data, new_w, new_h, 3 * new_w, QImage.Format_RGB888)
+    qt_img = QImage(frame_resized.data, new_w, new_h, 3 * new_w, QImage.Format_BGR888)
     return QPixmap.fromImage(qt_img)

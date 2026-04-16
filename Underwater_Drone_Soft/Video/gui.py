@@ -1,5 +1,4 @@
-﻿import cv2
-import time
+﻿import time
 from PySide6.QtWidgets import (
     QMainWindow, QLabel, QPushButton, QVBoxLayout, 
     QWidget, QGridLayout, QHBoxLayout

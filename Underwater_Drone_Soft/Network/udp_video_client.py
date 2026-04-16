@@ -54,7 +54,7 @@ class VideoClient:
                         self.frame_buffer.clear()
 
                     try:
-                        return simplejpeg.decode_jpeg(data, colorspace='RGB')
+                        return simplejpeg.decode_jpeg(data, colorspace='BGR')
                     except Exception:
                         return None
             except socket.timeout:
