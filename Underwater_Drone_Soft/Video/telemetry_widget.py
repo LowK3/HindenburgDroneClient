@@ -1,7 +1,10 @@
 ﻿from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
 from PySide6.QtCore import Qt, Signal
 from Video.gyro_widget import ArtificialHorizon
-from Video.styles import CONNECTION_PANEL_STYLE, TITLE_2_TEXT, TEXT_BOLD, ALERT_TEXT, WARNING_TEXT
+from Video.styles import (
+    CONNECTION_PANEL_STYLE, TITLE_2_TEXT, TEXT_BOLD, ALERT_TEXT, WARNING_TEXT,
+    CRITICAL_WARNING_TEXT
+)
 from config import ALERT_CPU_TEMP, ALERT_HULL_HUM
 
 class LeftTelemetryWidget(QWidget):
@@ -154,10 +157,10 @@ class WarningWidget(QWidget):
         self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 20, 0, 20)
+        layout.setContentsMargins(10, 30, 10, 30)
 
         self.leak_label = QLabel("")
-        self.leak_label.setStyleSheet(WARNING_TEXT)
+        self.leak_label.setStyleSheet(CRITICAL_WARNING_TEXT)
         self.leak_label.hide()
         layout.addWidget(self.leak_label, alignment=Qt.AlignTop | Qt.AlignHCenter)
 
@@ -172,7 +175,7 @@ class WarningWidget(QWidget):
 
     def update_ui(self, data: dict):
         if data.get("leak_detected", False):
-            self.leak_label.setText("WARNING! WATER DETECTED INSIDE THE HULL")
+            self.leak_label.setText("WARNING! WATER DETECTED INSIDE THE HULL.")
             self.leak_label.show()
         else:
             self.leak_label.hide()

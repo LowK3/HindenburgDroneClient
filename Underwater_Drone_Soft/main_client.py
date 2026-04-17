@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QApplication
 from Video.gui import VideoWindow
 from Utils.frame_buffer import FrameBuffer
 from Network.network_worker import NetworkWorker
+from Utils.common import preload_emojis
 from config import NETWORK_JOIN_TIMEOUT
 from Utils.logger import log, setup_logging
 
@@ -22,6 +23,7 @@ class ClientApp:
 
         # Start Qt GUI
         app = QApplication(sys.argv)
+        preload_emojis()
         window = VideoWindow(self.fb, net.control)
 
         exit_code = app.exec()

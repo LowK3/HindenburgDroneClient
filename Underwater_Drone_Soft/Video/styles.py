@@ -70,13 +70,18 @@ ALERT_TEXT = f"""
 
 WARNING_TEXT = f"""
     font-family: {FONT_FAMILY};
-    font-size: 26px;
+    font-size: 30px;
     font-weight: bold;
     color: black;
     background-color: {WARNING_YELLOW};
     border-radius: 8px; 
     padding: 8px 16px;
     border: 2px solid {BORDER_COLOR};
+"""
+
+CRITICAL_WARNING_TEXT = f"""
+    {WARNING_TEXT}
+    background-color: {ACCENT_RED};
 """
 
 MAIN_PANEL_STYLE = f"""
