@@ -105,17 +105,6 @@ class RightTelemetryWidget(QWidget):
         self.tel_hull_press.setAlignment(Qt.AlignRight)
         layout.addWidget(self.tel_hull_press)
 
-        self.tel_pitch = QLabel("PITCH: -- °")
-        self.tel_pitch.setStyleSheet(TEXT_BOLD)
-        self.tel_pitch.setAlignment(Qt.AlignRight)
-        layout.addSpacing(15)
-        layout.addWidget(self.tel_pitch)
-        
-        self.tel_roll = QLabel("ROLL: -- °")
-        self.tel_roll.setStyleSheet(TEXT_BOLD)
-        self.tel_roll.setAlignment(Qt.AlignRight)
-        layout.addWidget(self.tel_roll)
-
     def update_ui(self, data: dict):
         front_pct = data.get("front_pwr", 0)
         rear_pct = data.get("rear_pwr", 0)
@@ -139,8 +128,6 @@ class RightTelemetryWidget(QWidget):
         pitch = data.get("pitch", 0.0)
         roll = data.get("roll", 0.0)
         self.horizon.update_angles(pitch, roll)
-        self.tel_pitch.setText(f"PITCH: {pitch} °")
-        self.tel_roll.setText(f"ROLL: {roll} °")
 
     def reset_ui(self):
         self.tel_hull_temp.setText("HULL TEMP: -- °C")
@@ -148,8 +135,6 @@ class RightTelemetryWidget(QWidget):
         self.tel_hull_press.setText("HULL PRESS: -- mbar")
         self.tel_front_pwr.setText("FRONT PWR: -- %")
         self.tel_rear_pwr.setText("REAR PWR: -- %")
-        self.tel_pitch.setText("PITCH: -- °")
-        self.tel_roll.setText("ROLL: -- °")
 
 class WarningWidget(QWidget):
     def __init__(self, parent=None):
