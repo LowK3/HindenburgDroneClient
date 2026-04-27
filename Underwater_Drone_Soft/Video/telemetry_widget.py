@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt, Signal
 from Video.gyro_widget import ArtificialHorizon
 from Video.styles import (
     CONNECTION_PANEL_STYLE, TITLE_2_TEXT, TEXT_BOLD, ALERT_TEXT, WARNING_TEXT,
-    CRITICAL_WARNING_TEXT
+    CRITICAL_WARNING_TEXT, ALERT_HULL_TEMP
 )
 from config import ALERT_CPU_TEMP, ALERT_HULL_HUM
 
@@ -37,13 +37,15 @@ class LeftTelemetryWidget(QWidget):
         layout.addWidget(self.tel_power)
 
     def update_ui(self, data: dict):
-        """ Triggered automatically by the network listener """
-        self.tel_temp.setText(f"TEMP: {data['cpu_temp']} °C")
-        self.tel_cpu.setText(f"CPU: {data['cpu_usg']} %")
-        self.tel_ram.setText(f"RAM: {data['ram_usg']} %")
+        cpu_temp = data.get('cpu_temp', 0.0)
+        cpu_usg = data.get('cpu_usg', 0.0)
+        ram_usg = data.get('ram_usg', 0.0)
+        self.tel_temp.setText(f"TEMP: {cpu_temp} °C")
+        self.tel_cpu.setText(f"CPU: {cpu_usg} %")
+        self.tel_ram.setText(f"RAM: {ram_usg} %")
         
-        if data['cpu_temp'] > ALERT_CPU_TEMP:
-            self.tel_temp.setText(f"⚠️ CPU TEMP: {data['cpu_temp']} °C")
+        if cpu_temp > ALERT_CPU_TEMP:
+            self.tel_temp.setText(f"⚠️ CPU TEMP: {cpu_temp} °C")
             self.tel_temp.setStyleSheet(ALERT_TEXT)
         else:
             self.tel_temp.setStyleSheet(TEXT_BOLD)
@@ -125,6 +127,12 @@ class RightTelemetryWidget(QWidget):
             self.tel_hull_hum.setStyleSheet(TEXT_BOLD)
         pass
 
+        if hull_temp > ALERT_HULL_TEMP:
+            self.tel_hull_temp.setText(f"⚠️ HULL TEMP: {hull_temp} °C")
+            self.tel_hull_temp.setStyleSheet(ALERT_TEXT)
+        else:
+            self.tel_hull_temp.setStyleSheet(TEXT_BOLD)
+
         pitch = data.get("pitch", 0.0)
         roll = data.get("roll", 0.0)
         self.horizon.update_angles(pitch, roll)
@@ -165,7 +173,7 @@ class WarningWidget(QWidget):
         else:
             self.leak_label.hide()
 
-        if not data.get("camera_status", True):
+        if data.get("camera_status", False):
             self.camera_warning_label.setText("WARNING! CAMERA FAILED TO START. DRONE IS STILL DRIVABLE.")
             self.camera_warning_label.show()
         else:

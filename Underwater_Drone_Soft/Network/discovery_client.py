@@ -38,7 +38,6 @@ class DiscoveryClient:
                     return addr[0], port
         except Exception as e:
             log(f"Discovery error: {e}\n{traceback.format_exc()}")
-            # finally:
             self.stop()
         return None, None
 

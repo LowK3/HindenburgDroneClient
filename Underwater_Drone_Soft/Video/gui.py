@@ -50,6 +50,23 @@ class VideoWindow(QMainWindow):
         self.control.telemetry_received.connect(self.right_telemetry_panel.update_ui)
         self.control.telemetry_received.connect(self.warning_panel.update_ui)
 
+    # --- FAKE TELEMETRY INJECTOR ---
+        self.debug_timer = QTimer(self)
+        self.debug_timer.timeout.connect(self._inject_debug_telemetry)
+        self.debug_timer.start(2000)  # Fires every 2 seconds
+
+    def _inject_debug_telemetry(self):
+        fake_data = {
+            "pitch": 25.0,
+            "roll": -15.0,
+            "leak_detected": True,
+            "hull_hum": 90.0,
+            "hull_temp": 80.0,
+            "cpu_temp": 82.0,
+            "camera_status": True,
+        }
+        # Emits directly to the UI elements
+        self.control.telemetry_received.emit(fake_data)
 
     def _setup_ui(self):
         """ Builds the main video layouts and overlay stack. """

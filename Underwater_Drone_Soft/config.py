@@ -37,6 +37,7 @@ LOG_BACKUP_COUNT = 2
 # --- Telemetry Alert Thresholds ---
 ALERT_CPU_TEMP = 75.0
 ALERT_HULL_HUM = 65.0
+ALERT_HULL_TEMP = 50.0
 
 # --- Video display settings ---
 WINDOW_NAME = "Hindenburg Drone Controller"
