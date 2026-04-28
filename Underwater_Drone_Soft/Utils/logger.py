@@ -8,7 +8,7 @@ import subprocess
 from logging.handlers import RotatingFileHandler
 from config import LOG_PREFIX, LOG_DIR, LOG_MAX_BYTES, LOG_BACKUP_COUNT
 
-logger = logging.getLogger("DroneClient")
+logger = logging.getLogger("ClientLogger")
 
 def setup_logging():
     if not os.path.exists(LOG_DIR):
@@ -18,14 +18,14 @@ def setup_logging():
     logger.setLevel(logging.INFO)
 
     file_handler = RotatingFileHandler(LOG_FILE, maxBytes=LOG_MAX_BYTES, backupCount=LOG_BACKUP_COUNT)
-    formatter = logging.Formatter("[CLIENT] [%(asctime)s] | %(message)s", datefmt="%H:%M:%S")
+    formatter = logging.Formatter("[CLIENT] [%(asctime)s] | %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
 
     sys.excepthook = global_crash_handler
 
 def log(msg: str):
-    ts = time.strftime("%H:%M:%S")
+    ts = time.strftime("%Y-%m-%d %H:%M:%S")
     print(f"{LOG_PREFIX} {ts} | {msg}")
     logger.info(msg)
 
