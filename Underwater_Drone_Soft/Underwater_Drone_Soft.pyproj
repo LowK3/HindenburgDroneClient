@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Video\assets\1.jpg" />
+    <Content Include="Video\assets\2.jpg" />
     <Content Include="Video\assets\3.jpg" />
     <Content Include="Video\assets\4.jpg" />
     <Content Include="Video\assets\5.jpg" />
