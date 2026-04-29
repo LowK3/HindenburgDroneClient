@@ -34,7 +34,7 @@ class InfoWidget(QWidget):
         instructions = QLabel(
             "Default Controls:\n"
             "- Drive: W, A, S, D\n"
-            "- Tilt: U (Up) and J (Down)\n"
+            "- Tilt: E (Up) and Q (Down)\n"
             "- Front Power: I (Increase) and K (Decrease)\n"
             "- Rear Power: O (Increase) and L (Decrease)\n\n"
             "Press 'Esc' to open the menu and configure custom keybindings in the Settings tab.\n\n"

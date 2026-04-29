@@ -13,7 +13,7 @@ class InputManager(QObject):
         self.settings = QSettings("HindenburgDrone", "DroneClient")
         self.default_bindings = {
             "W": Qt.Key_W, "S": Qt.Key_S, "A": Qt.Key_A, "D": Qt.Key_D,
-            "UP": Qt.Key_U, "DOWN": Qt.Key_J,
+            "UP": Qt.Key_E, "DOWN": Qt.Key_Q,
             "REAR+": Qt.Key_O, "REAR-": Qt.Key_L,
             "FRONT+": Qt.Key_I, "FRONT-": Qt.Key_K
         }
