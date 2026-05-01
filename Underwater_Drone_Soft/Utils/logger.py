@@ -40,13 +40,13 @@ def open_logs_file():
         return
 
     try:
-        with open(source_file, 'r', encoding='utf-8') as f:
+        with open(source_file, "r", encoding="latin-1") as f:
             lines = f.readlines()
 
-        with open(reversed_file, 'w', encoding='utf-8') as f:
+        with open(reversed_file, "w", encoding="latin-1") as f:
             f.writelines(reversed(lines))
 
-        if platform.system() == 'Windows':
+        if platform.system() == "Windows":
             os.startfile(reversed_file)
     except Exception as e:
         log(f"Failed to open reversed log: {e}\n{traceback.format_exc()}")
