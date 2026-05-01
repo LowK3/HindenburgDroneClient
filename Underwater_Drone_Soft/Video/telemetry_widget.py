@@ -1,6 +1,6 @@
 ﻿from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
 from PySide6.QtCore import Qt, Signal
-from Video.gyro_widget import ArtificialHorizon
+from Video.artificial_horizon_widget import ArtificialHorizon
 from Video.styles import (
     CONNECTION_PANEL_STYLE, TITLE_2_TEXT, TEXT_BOLD, ALERT_TEXT, WARNING_TEXT,
     CRITICAL_WARNING_TEXT
