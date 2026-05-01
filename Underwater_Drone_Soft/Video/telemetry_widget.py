@@ -142,6 +142,7 @@ class RightTelemetryWidget(QWidget):
         self.tel_hull_press.setText("HULL PRESS: -- mbar")
         self.tel_front_pwr.setText("FRONT PWR: -- %")
         self.tel_rear_pwr.setText("REAR PWR: -- %")
+        self.horizon.update_angles(0.0, 0.0)
 
     def _update_alert_label(self, label, value, prefix, unit, threshold):
         if value is not None:
