@@ -31,8 +31,8 @@ FRAME_BUFFER_LIMIT = 100
 # --- Logging ---
 LOG_PREFIX = "[CLIENT]"
 LOG_DIR = "logs"
-LOG_MAX_BYTES = 5 * 1024 * 1024
-LOG_BACKUP_COUNT = 2
+LOG_MAX_BYTES = 2 * 1024 * 1024
+LOG_BACKUP_COUNT = 4
 
 # --- Telemetry Alert Thresholds ---
 ALERT_CPU_TEMP = 75.0
