@@ -33,7 +33,6 @@ class ArtificialHorizon(QWidget):
         clip_path.addEllipse(0, 0, width, height)
         painter.setClipPath(clip_path)
 
-        # Save origin state
         painter.save()
         painter.translate(center_x, center_y)
 
@@ -42,11 +41,10 @@ class ArtificialHorizon(QWidget):
         pitch_pixels = self.pitch * 4.0  # Scale: 4 pixels per degree of pitch
         painter.translate(0, pitch_pixels)
 
-        # Draw the Horizon Line
         painter.setPen(QPen(QColor(RETICLE_GREEN), 2))
         painter.drawLine(-width, 0, width, 0)
 
-        # Draw the Pitch Ladder
+        # Pitch Ladder
         painter.setPen(QPen(QColor(RETICLE_L_GREY), 1))
         font = painter.font()
         font.setPixelSize(15)
@@ -55,27 +53,25 @@ class ArtificialHorizon(QWidget):
         for i in range(-36, 37):
             if i == 0: continue
 
-            # i represents 5 degrees. At 3 pixels per degree, y_pos shifts by 20.
+            # i represents 5 degrees. At 4 pixels per degree, y_pos shifts by 20.
             y_pos = i * 20
             if i % 2 == 0:
-                # Major lines (10, 20, 30 degrees)
                 line_width = 30
                 painter.drawLine(-line_width, y_pos, line_width, y_pos)
                 
-                # Calculate and draw the text
+                # Invert pitch values so positive pitch moves ladder down, bringing positive numbers to center
                 pitch_val = -i * 5 
                 painter.drawText(-line_width - 30, y_pos + 4, str(pitch_val))
                 painter.drawText(line_width + 8, y_pos + 4, str(pitch_val))
             else:
-                # Minor lines (5, 15, 25 degrees)
                 line_width = 15
                 painter.drawLine(-line_width, y_pos, line_width, y_pos)
 
-        # Restore origin to draw the fixed submarine reticle
+        
         painter.restore()
         painter.translate(center_x, center_y)
 
-        # Draw Fixed Submarine Reticle (Yellow)
+        # Submarine Reticle (Yellow)
         painter.setPen(QPen(QColor(RETICLE_YELLOW), 3))
         # Center dot
         painter.drawPoint(0, 0)

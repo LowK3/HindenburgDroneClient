@@ -34,6 +34,7 @@ class VideoClient:
 
                 if len(packet) < VIDEO_HEADER_SIZE: continue
 
+                # Header: MagicByte, FrameID, ChunkIndex, TotalChunks
                 magic, frame_id, chunk_idx, total_chunks = struct.unpack("<BIBB", packet[:VIDEO_HEADER_SIZE])
                 if magic != MAGIC_BYTE: continue
 
@@ -42,11 +43,10 @@ class VideoClient:
 
                 self.frame_buffer[frame_id][chunk_idx] = packet[VIDEO_HEADER_SIZE:]
 
-                # If we have received all chunks for this frame
                 if len(self.frame_buffer[frame_id]) == total_chunks:
                     data = b"".join([self.frame_buffer[frame_id][i] for i in range(total_chunks)])
                     
-                    # Clean up old frames to prevent memory leaks
+                    # Clean up older frames that were dropped/incomplete
                     keys_to_delete = [k for k in self.frame_buffer.keys() if k <= frame_id]
                     for k in keys_to_delete: del self.frame_buffer[k]
 

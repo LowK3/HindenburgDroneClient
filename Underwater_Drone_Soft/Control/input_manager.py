@@ -42,6 +42,7 @@ class InputManager(QObject):
         self.command_requested.emit({"cmd": "PING"})
 
     def key_pressed(self, event):
+        # Ignore key hold repetition to prevent spamming the TCP socket
         if event.isAutoRepeat(): 
             return
         cmd = self.key_to_cmd.get(event.key())
