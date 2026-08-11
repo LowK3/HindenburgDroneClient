@@ -27,6 +27,7 @@ class VideoWindow(QMainWindow):
         # 1. Setup Data & Timers
         self.input = InputManager()
         self.input.command_requested.connect(self.control.send)
+        self.input.command_requested.connect(lambda payload: print(f"DEBUG OUTPUT: {payload}"))
 
         self.timer = QTimer()
         self.timer.timeout.connect(self._update_frame)
@@ -49,6 +50,8 @@ class VideoWindow(QMainWindow):
         self.control.telemetry_received.connect(self.left_telemetry_panel.update_ui)
         self.control.telemetry_received.connect(self.right_telemetry_panel.update_ui)
         self.control.telemetry_received.connect(self.warning_panel.update_ui)
+        self.input.front_power_changed.connect(self.right_telemetry_panel.update_front_power)
+        self.input.rear_power_changed.connect(self.right_telemetry_panel.update_rear_power)
 
     def _setup_ui(self):
         """ Builds the main video layouts and overlay stack. """

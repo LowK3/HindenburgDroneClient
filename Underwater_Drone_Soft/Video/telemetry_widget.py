@@ -117,14 +117,13 @@ class RightTelemetryWidget(QWidget):
         self.tel_hull_press.setAlignment(Qt.AlignRight)
         layout.addWidget(self.tel_hull_press)
 
-    def update_ui(self, data: dict): 
-        front_pwr = data.get("front_pwr")
-        rear_pwr = data.get("rear_pwr") 
-        front_pwr_str = front_pwr if front_pwr is not None else "--"
-        rear_pwr_str = rear_pwr if rear_pwr is not None else "--"
-        self.tel_front_pwr.setText(f"FRONT PWR: {front_pwr_str} %")
-        self.tel_rear_pwr.setText(f"REAR PWR: {rear_pwr_str} %")
+    def update_front_power(self, percentage: int):
+        self.tel_front_pwr.setText(f"FRONT PWR: {percentage} %")
 
+    def update_rear_power(self, percentage: int):
+        self.tel_rear_pwr.setText(f"REAR PWR: {percentage} %")
+
+    def update_ui(self, data: dict):
         self._update_alert_label(self.tel_hull_temp, data.get("hull_temp"), "HULL TEMP", "°C", ALERT_HULL_TEMP)
         self._update_alert_label(self.tel_hull_hum, data.get("hull_hum"), "HULL HUM", "%", ALERT_HULL_HUM)
 
@@ -140,8 +139,8 @@ class RightTelemetryWidget(QWidget):
         self.tel_hull_temp.setText("HULL TEMP: -- °C")
         self.tel_hull_hum.setText("HULL HUM: -- %")
         self.tel_hull_press.setText("HULL PRESS: -- mbar")
-        self.tel_front_pwr.setText("FRONT PWR: -- %")
-        self.tel_rear_pwr.setText("REAR PWR: -- %")
+        #self.tel_front_pwr.setText("FRONT PWR: -- %")
+        #self.tel_rear_pwr.setText("REAR PWR: -- %")
         self.horizon.update_angles(0.0, 0.0)
 
     def _update_alert_label(self, label, value, prefix, unit, threshold):

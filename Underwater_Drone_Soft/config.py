@@ -41,3 +41,14 @@ ALERT_HULL_TEMP = 50.0
 
 # --- Video display settings ---
 WINDOW_NAME = "Hindenburg Drone Controller"
+
+# --- Controller Settings ---
+JOYSTICK_DEADZONE = 0.10
+DEFAULT_POWER_SCALE = 0.20
+POWER_STEP = 0.05
+POWER_MIN = 0.05
+POWER_MAX = 1.00
+AXIS_YAW = 0
+AXIS_FWD = 1
+AXIS_DEPTH_ALT = 3
+AXIS_DEPTH = 4

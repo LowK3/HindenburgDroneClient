@@ -9,10 +9,11 @@ from Video.styles import (
 )
 
 CMD_LABELS = {
-    "W": "FORWARD", "S": "BACKWARD", "A": "TURN LEFT", "D": "TURN RIGHT",
-    "UP": "TILT UP", "DOWN": "TILT DOWN",
-    "REAR+": "REAR POWER +", "REAR-": "REAR POWER -",
-    "FRONT+": "FRONT POWER +", "FRONT-": "FRONT POWER -"
+    "FORWARD": "FORWARD", "BACKWARD": "BACKWARD",
+    "TURN_LEFT": "TURN LEFT", "TURN_RIGHT": "TURN RIGHT",
+    "TILT_UP": "TILT UP", "TILT_DOWN": "TILT DOWN",
+    "REAR_PWR_INC": "REAR POWER +", "REAR_PWR_DEC": "REAR POWER -",
+    "FRONT_PWR_INC": "FRONT POWER +", "FRONT_PWR_DEC": "FRONT POWER -"
 }
 
 class KeyGrabberButton(QPushButton):
