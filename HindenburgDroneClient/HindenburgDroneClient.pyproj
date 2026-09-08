@@ -10,8 +10,8 @@
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>Underwater_Drone_Soft</Name>
-    <RootNamespace>Underwater_Drone_Soft</RootNamespace>
+    <Name>HindenburgDroneClient</Name>
+    <RootNamespace>HindenburgDroneClient</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <EnableNativeCodeDebugging>True</EnableNativeCodeDebugging>
     <Environment>
