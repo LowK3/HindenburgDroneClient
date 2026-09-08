@@ -105,6 +105,6 @@ python main_client.py
 
 ## Related Repository
 
-The Onboard System Server for the ROV is available here:
+The onboard software running on the Raspberry Pi is maintained separately:
 
 - [HindenburgDroneServer](https://github.com/LowK3/HindenburgDroneServer)
