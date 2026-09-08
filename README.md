@@ -2,10 +2,25 @@
 
 Qt-based desktop control application for low-latency teleoperation, video streaming, and telemetry monitoring of the underwater ROV **Hindenburg**.
 
+                  HINDENBURG ROV
+                       │
+             ┌─────────┴─────────┐
+             │                   │
+       Raspberry Pi 4B      Sensors / ESCs
+             │
+       Onboard Server
+             │
+        TCP / UDP
+             │
+             ▼
+      Ground Control Station
+             │
+       Keyboard / Gamepad
+
 ## Features
 
 * **Keyboard Control:** Currently supported keyboard-based control for ROV movement and thruster operation.
-* **Gamepad & Joystick Support:** Proportional analog control via `pygame-ce` � **coming soon**.
+* **Gamepad & Joystick Support:** Proportional analog control via `pygame-ce` — **coming soon**.
 * **Video Pipeline:** High-speed JPEG frame decoding using `simplejpeg` with dynamic frame scaling via `opencv-python`.
 * **Telemetry Display:** Real-time monitoring of hull temperature, humidity, system performance, thruster output, and ROV position.
 
