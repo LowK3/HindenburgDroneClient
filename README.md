@@ -60,3 +60,8 @@ pip install -r requirements.txt
 ```bash
 python main_client.py
 ```
+
+## Related Repository
+
+The onboard software running on the Raspberry Pi is maintained separately:
+- [HindenburgDroneServer](https://github.com/LowK3/HindenburgDroneServer)
