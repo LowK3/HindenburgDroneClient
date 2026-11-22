@@ -9,6 +9,7 @@ HANDSHAKE_REPLY_PREFIX = "PI_SERVER"
 
 # --- Network settings ---
 UDP_BUFFER_SIZE = 65536
+TCP_BUFFER_SIZE = 4096
 TCP_RECV_CHUNK = 1024
 DISCOVERY_RECV_CHUNK = 1024
 
@@ -41,3 +42,11 @@ ALERT_HULL_TEMP = 50.0
 
 # --- Video display settings ---
 WINDOW_NAME = "Hindenburg Drone Controller"
+
+# --- Telemetry Packet Types ---
+TELEMETRY_PACKET_TYPES = (
+    "IMU",
+    "THRUSTERS",
+    "LEAK",
+    "ENVIRONMENT"
+)
